@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.gov.dwp</groupId>
-    <artifactId>gpconnect-facade</artifactId>
+    <artifactId>gpconnect-smartonfhir</artifactId>
     <version>3.8.0-SNAPSHOT</version>
-    <name>gpconnect-facade</name>
+    <name>gpconnect-smartonfhir</name>
 
 
 
