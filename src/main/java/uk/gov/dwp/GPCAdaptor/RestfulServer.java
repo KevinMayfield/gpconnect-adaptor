@@ -11,8 +11,7 @@ import ca.uhn.fhir.util.VersionUtil;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
-import uk.gov.dwp.GPCAdaptor.providers.ConformanceProvider;
-import uk.gov.dwp.GPCAdaptor.providers.MedicationStatementResourceProvider;
+import uk.gov.dwp.GPCAdaptor.providers.*;
 import uk.gov.dwp.GPCAdaptor.support.ServerInterceptor;
 
 
@@ -62,6 +61,11 @@ public class RestfulServer extends ca.uhn.fhir.rest.server.RestfulServer {
         }
         List<IResourceProvider> resourceProviders = new ArrayList<>();
         resourceProviders.add(appCtx.getBean(MedicationStatementResourceProvider.class));
+        resourceProviders.add(appCtx.getBean(PatientResourceProvider.class));
+        resourceProviders.add(appCtx.getBean(PractitionerResourceProvider.class));
+        resourceProviders.add(appCtx.getBean(LocationResourceProvider.class));
+        resourceProviders.add(appCtx.getBean(OrganizationResourceProvider.class));
+        resourceProviders.add(appCtx.getBean(ConditionResourceProvider.class));
 
         setFhirContext(appCtx.getBean(FhirContext.class));
 

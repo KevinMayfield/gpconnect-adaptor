@@ -1,46 +1,52 @@
 package uk.gov.dwp.GPCAdaptor.providers;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.annotation.*;
+import ca.uhn.fhir.rest.annotation.OptionalParam;
+import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import org.hl7.fhir.dstu3.model.Condition;
 import org.hl7.fhir.dstu3.model.MedicationStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import uk.gov.dwp.GPCAdaptor.dao.ICondition;
 import uk.gov.dwp.GPCAdaptor.dao.IMedicationStatement;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Component
-public class MedicationStatementResourceProvider implements IResourceProvider {
+public class ConditionResourceProvider implements IResourceProvider {
 
 
     @Autowired
     FhirContext ctx;
 
     @Autowired
+    @Qualifier("CLIENTDSTU2")
     IGenericClient client;
 
     @Autowired
-    IMedicationStatement resourceDao;
+    ICondition resourceDao;
 
-    private static final Logger log = LoggerFactory.getLogger(MedicationStatementResourceProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(ConditionResourceProvider.class);
 
     @Override
-    public Class<MedicationStatement> getResourceType() {
-        return MedicationStatement.class;
+    public Class<Condition> getResourceType() {
+        return Condition.class;
     }
 
 
     @Search
-    public List<MedicationStatement> search(HttpServletRequest httpRequest,
-                                                               @OptionalParam(name = MedicationStatement.SP_PATIENT) ReferenceParam patient
+    public List<Condition> search(HttpServletRequest httpRequest,
+                                                               @OptionalParam(name = Condition.SP_PATIENT) ReferenceParam patient
     ) throws Exception {
 
-        return resourceDao.search(ctx,patient);
+        return resourceDao.search(client,patient);
 
 
     }

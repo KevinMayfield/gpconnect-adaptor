@@ -25,7 +25,7 @@ public class CreateAuthToken {
         CreatePayloadData createPayloadData = new CreatePayloadData();
         String jsonString = createPayloadData.buildPayloadData(exp, iat, write);
 
-        System.out.println(jsonString);
+       // System.out.println(jsonString);
 
         // Use example - https://github.com/jwtk/jjwt/
         String compactJws = Jwts.builder()
@@ -34,7 +34,7 @@ public class CreateAuthToken {
                 .setPayload(jsonString)
                 .compact();
 
-        System.out.println("JSON Web Token : " + compactJws);
+      //  System.out.println("JSON Web Token : " + compactJws);
 
         return compactJws;
     }

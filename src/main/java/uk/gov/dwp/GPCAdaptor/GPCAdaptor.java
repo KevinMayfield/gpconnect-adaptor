@@ -3,22 +3,20 @@ package uk.gov.dwp.GPCAdaptor;
 import ca.uhn.fhir.context.FhirContext;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import org.apache.camel.CamelContext;
-import org.apache.camel.impl.DefaultCamelContextNameStrategy;
-import org.apache.camel.spring.boot.CamelContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import uk.gov.dwp.GPCAdaptor.support.CorsFilter;
 import uk.gov.dwp.GPCAdaptor.support.CreateAuthToken;
-import uk.gov.dwp.GPCAdaptor.support.HttpHeaderInterceptor;
 import uk.gov.dwp.GPCAdaptor.support.SSPInterceptor;
 
 @SpringBootApplication
@@ -53,15 +51,33 @@ public class GPCAdaptor {
     }
 
     @Bean
+    @Primary
     public FhirContext FhirContextBean() {
         return FhirContext.forDstu3();
     }
 
+    @Bean("CTXDSTU2")
+    public FhirContext FhirContextBeanDSTU2() {
+        return FhirContext.forDstu2();
+    }
+
+
     @Bean
+    @Primary
     public IGenericClient getGPCConnection(FhirContext ctx) {
-        HttpHeaderInterceptor interactionIdInterceptor = new HttpHeaderInterceptor("Ssp-InteractionID=urn:nhs:names:services:gpconnect:fhir:operation:gpc.getstructuredrecord-1");
+        SSPInterceptor interactionIdInterceptor = new SSPInterceptor();
 
         IGenericClient client = ctx.newRestfulGenericClient(HapiProperties.getGpConnectServer());
+        client.registerInterceptor(CreateAuthToken.createAuthInterceptor(false));
+        client.registerInterceptor(interactionIdInterceptor);
+        return client;
+    }
+
+    @Bean("CLIENTDSTU2")
+    public IGenericClient getGPCConnectionDSTU2(@Qualifier("CTXDSTU2") FhirContext ctx) {
+        SSPInterceptor interactionIdInterceptor = new SSPInterceptor();
+
+        IGenericClient client = ctx.newRestfulGenericClient(HapiProperties.getGpConnectServerV0());
         client.registerInterceptor(CreateAuthToken.createAuthInterceptor(false));
         client.registerInterceptor(interactionIdInterceptor);
         return client;
@@ -80,24 +96,6 @@ public class GPCAdaptor {
         FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter());
         bean.setOrder(0);
         return bean;
-    }
-
-
-    @Bean
-    CamelContextConfiguration contextConfiguration() {
-        return new CamelContextConfiguration() {
-
-            @Override
-            public void beforeApplicationStart(CamelContext camelContext) {
-
-                camelContext.setNameStrategy(new DefaultCamelContextNameStrategy("GPCAdaptor"));
-            }
-
-            @Override
-            public void afterApplicationStart(CamelContext camelContext) {
-
-            }
-        };
     }
 
 

@@ -34,4 +34,12 @@ public abstract class StructuredRecord {
 
         return theParameters;
     }
+
+    public static ca.uhn.fhir.model.dstu2.resource.Parameters getUnStructuredRecordParameters(String nhsNumber,boolean resolevAllergies, boolean prescriptionIssues, DateType fromDate) {
+        final ca.uhn.fhir.model.dstu2.resource.Parameters theParameters = new ca.uhn.fhir.model.dstu2.resource.Parameters();
+        final ca.uhn.fhir.model.dstu2.resource.Parameters.Parameter param = theParameters.addParameter();
+        param.setName("patientNHSNumber");
+
+        return theParameters;
+    }
 }

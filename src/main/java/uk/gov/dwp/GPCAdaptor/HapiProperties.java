@@ -68,6 +68,7 @@ public class HapiProperties {
     static final String SECURITY_SMART_SCOPE = "security.oauth2.smart";
 
     static final String GP_CONNECT_SERVER = "gpconnect.address";
+    static final String GP_CONNECT_SERVER_V0 = "gpconnect.addressDSTU2";
 
     static final String GP_CONNECT_ASID_FROM = "gpconnect.ASIDfrom";
     static final String GP_CONNECT_ASID_TO = "gpconnect.ASIDto";
@@ -416,6 +417,10 @@ public class HapiProperties {
 
     public static String getGpConnectServer() {
         return HapiProperties.getProperty(GP_CONNECT_SERVER);
+    }
+
+    public static String getGpConnectServerV0() {
+        return HapiProperties.getProperty(GP_CONNECT_SERVER_V0);
     }
 
     public static String getGpConnectAsidFrom() {
