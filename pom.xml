@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.gov.dwp</groupId>
-    <artifactId>gpconnect-smartonfhir</artifactId>
+    <artifactId>gpconnect-oauth2-smart</artifactId>
     <version>3.8.0-SNAPSHOT</version>
-    <name>gpconnect-smartonfhir</name>
+    <name>gpconnect-oauth2-smart</name>
 
 
 
@@ -149,17 +149,9 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-hl7</artifactId>
-            <version>${camel-version}</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-mina2</artifactId>
-            <version>${camel-version}</version>
-        </dependency>
+
+
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -174,11 +166,6 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>ca.uhn.hapi</groupId>
-            <artifactId>hapi-structures-v24</artifactId>
-            <version>2.3</version>
-        </dependency>
 
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
@@ -306,7 +293,7 @@
     </dependencies>
 
     <build>
-        <finalName>ccri-messaging</finalName>
+        <finalName>gpconnect-oauth2-smart</finalName>
         <plugins>
 
 
@@ -314,13 +301,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5</version>
-
+                <version>3.8.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>11</release>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
