@@ -69,6 +69,9 @@ public class HapiProperties {
 
     static final String GP_CONNECT_SERVER = "gpconnect.address";
 
+    static final String GP_CONNECT_ASID_FROM = "gpconnect.ASIDfrom";
+    static final String GP_CONNECT_ASID_TO = "gpconnect.ASIDto";
+
     private static Properties properties;
 
     /*
@@ -413,5 +416,13 @@ public class HapiProperties {
 
     public static String getGpConnectServer() {
         return HapiProperties.getProperty(GP_CONNECT_SERVER);
+    }
+
+    public static String getGpConnectAsidFrom() {
+        return HapiProperties.getProperty(GP_CONNECT_ASID_FROM);
+    }
+
+    public static String getGpConnectAsidTo() {
+        return HapiProperties.getProperty(GP_CONNECT_ASID_TO);
     }
 }

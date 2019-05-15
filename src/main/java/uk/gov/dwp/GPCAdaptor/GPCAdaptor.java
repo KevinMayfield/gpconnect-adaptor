@@ -17,6 +17,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import uk.gov.dwp.GPCAdaptor.support.CorsFilter;
+import uk.gov.dwp.GPCAdaptor.support.CreateAuthToken;
+import uk.gov.dwp.GPCAdaptor.support.HttpHeaderInterceptor;
+import uk.gov.dwp.GPCAdaptor.support.SSPInterceptor;
 
 @SpringBootApplication
 public class GPCAdaptor {
@@ -56,7 +59,12 @@ public class GPCAdaptor {
 
     @Bean
     public IGenericClient getGPCConnection(FhirContext ctx) {
-        return ctx.newRestfulGenericClient(HapiProperties.getGpConnectServer());
+        HttpHeaderInterceptor interactionIdInterceptor = new HttpHeaderInterceptor("Ssp-InteractionID=urn:nhs:names:services:gpconnect:fhir:operation:gpc.getstructuredrecord-1");
+
+        IGenericClient client = ctx.newRestfulGenericClient(HapiProperties.getGpConnectServer());
+        client.registerInterceptor(CreateAuthToken.createAuthInterceptor(false));
+        client.registerInterceptor(interactionIdInterceptor);
+        return client;
     }
 
     @Bean

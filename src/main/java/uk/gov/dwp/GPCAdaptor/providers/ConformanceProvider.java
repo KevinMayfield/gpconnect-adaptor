@@ -49,12 +49,6 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
     	
     	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(theRequest.getServletContext());
     	log.info("restful2 Server not null = " + ctx.getEnvironment().getProperty("ccri.validate_flag"));
-    	 
-        String CRUD_update =  ctx.getEnvironment().getProperty("ccri.CRUD_update");
-        String CRUD_delete = ctx.getEnvironment().getProperty("ccri.CRUD_delete");
-        String CRUD_create = ctx.getEnvironment().getProperty("ccri.CRUD_create");
-        String CRUD_read = ctx.getEnvironment().getProperty("ccri.CRUD_read");
-
 
         String oauth2authorize = ctx.getEnvironment().getProperty("ccri.oauth2.authorize");
         String oauth2token = ctx.getEnvironment().getProperty("ccri.oauth2.token");
@@ -140,33 +134,7 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
                         break;
                     }
                 	// Start of CRUD operations
-               	 List<ResourceInteractionComponent> l = restResourceComponent.getInteraction();
-                    for(int i=0;i<l.size();i++)
-                    	if(CRUD_read.equals("false"))
-                    	if (restResourceComponent.getInteraction().get(i).getCode().toString()=="READ")
-                    	{
-                    		restResourceComponent.getInteraction().remove(i);
-                    	}	
-                    for(int i=0;i<l.size();i++)
-                    	if(CRUD_update.equals("false"))
-                    	if (restResourceComponent.getInteraction().get(i).getCode().toString()=="UPDATE")
-                    	{
-                    		restResourceComponent.getInteraction().remove(i);
-                    	}	
-                    for(int i=0;i<l.size();i++)
-                    	if(CRUD_create.equals("false"))
-                    	if (restResourceComponent.getInteraction().get(i).getCode().toString()=="CREATE")
-                    	{
-                    		restResourceComponent.getInteraction().remove(i);
-                    	}	
-                    for(int i=0;i<l.size();i++)
-                    	if(CRUD_delete.equals("false"))
-                    	if (restResourceComponent.getInteraction().get(i).getCode().toString()=="DELETE")
-                    	{
-                    		restResourceComponent.getInteraction().remove(i);
-                    	}	
-                    // End of CRUD operations
-                    
+
                     log.trace("restResourceComponent.getType - " + restResourceComponent.getType());
                    for (IResourceProvider provider : restfulServer.getResourceProviders()) {
 

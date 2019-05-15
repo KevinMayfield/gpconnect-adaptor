@@ -1,5 +1,6 @@
 package uk.gov.dwp.GPCAdaptor.dao;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
@@ -12,6 +13,6 @@ import java.util.List;
 public interface IMedicationStatement {
 
 
-    List<MedicationStatement> search(IGenericClient client, ReferenceParam patient) throws Exception;
+    List<MedicationStatement> search(FhirContext ctx, ReferenceParam patient) throws Exception;
 
 }
