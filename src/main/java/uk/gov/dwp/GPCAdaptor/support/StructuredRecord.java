@@ -1,5 +1,7 @@
 package uk.gov.dwp.GPCAdaptor.support;
 
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import org.hl7.fhir.dstu3.model.BooleanType;
 import org.hl7.fhir.dstu3.model.DateType;
 import org.hl7.fhir.dstu3.model.Identifier;
@@ -37,9 +39,48 @@ public abstract class StructuredRecord {
 
     public static ca.uhn.fhir.model.dstu2.resource.Parameters getUnStructuredRecordParameters(String nhsNumber,boolean resolevAllergies, boolean prescriptionIssues, DateType fromDate) {
         final ca.uhn.fhir.model.dstu2.resource.Parameters theParameters = new ca.uhn.fhir.model.dstu2.resource.Parameters();
-        final ca.uhn.fhir.model.dstu2.resource.Parameters.Parameter param = theParameters.addParameter();
+        ca.uhn.fhir.model.dstu2.resource.Parameters.Parameter param = theParameters.addParameter();
         param.setName("patientNHSNumber");
+        param.setValue(
+                new IdentifierDt()
+                        .setSystem("http://fhir.nhs.net/Id/nhs-number")
+                .setValue(nhsNumber)
+        );
+        param = theParameters.addParameter();
+        param.setName("recordSection");
+        CodeableConceptDt code = new CodeableConceptDt();
+        code.addCoding()
+                .setSystem("http://fhir.nhs.net/ValueSet/gpconnect-record-section-1")
+                .setCode("ALL");
 
         return theParameters;
+
+
+        /*
+
+        {
+  "resourceType": "Parameters",
+  "parameter": [
+    {
+      "name": "patientNHSNumber",
+      "valueIdentifier": {
+        "system": "http://fhir.nhs.net/Id/nhs-number",
+        "value": "9658218873"
+      }
+    },
+    {
+      "name": "recordSection",
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://fhir.nhs.net/ValueSet/gpconnect-record-section-1",
+            "code": "ALL"
+          }
+        ]
+      }
+    }
+  ]
+}
+         */
     }
 }

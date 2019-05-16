@@ -31,7 +31,7 @@ public class ConditionDao implements ICondition {
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),false, false, null);
         Bundle result = client.operation().onType(Patient.class)
-                .named("$gpc.getstructuredrecord")
+                .named("$gpc.getcarerecord")
                 .withParameters(parameters)
                 .returnResourceType(Bundle.class)
                 .execute();

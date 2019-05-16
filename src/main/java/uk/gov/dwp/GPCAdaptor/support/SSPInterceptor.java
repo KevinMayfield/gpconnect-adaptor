@@ -16,6 +16,9 @@ public class SSPInterceptor implements IClientInterceptor {
     @Override
     public void interceptRequest(IHttpRequest iHttpRequest) {
 
+        Boolean isDSTU2 = false;
+
+        System.out.println(iHttpRequest.getUri());
         if (iHttpRequest.getHttpVerbName().equals("GET")) {
 
             iHttpRequest.addHeader("Ssp-From", HapiProperties.getGpConnectAsidFrom());
@@ -25,6 +28,10 @@ public class SSPInterceptor implements IClientInterceptor {
         }
         if (iHttpRequest.getUri().contains("Patient/$gpc.getstructuredrecord")) {
             iHttpRequest.addHeader("Ssp-InteractionID", "urn:nhs:names:services:gpconnect:fhir:operation:gpc.getstructuredrecord-1");
+        }
+        if (iHttpRequest.getUri().contains("Patient/$gpc.getcarerecord")) {
+            iHttpRequest.addHeader("Ssp-InteractionID", "urn:nhs:names:services:gpconnect:fhir:operation:gpc.getcarerecord");
+            isDSTU2 = true;
         }
         if (iHttpRequest.getUri().contains("Patient?identifier")) {
             iHttpRequest.addHeader("Ssp-InteractionID", "urn:nhs:names:services:gpconnect:fhir:rest:search:patient-1");
@@ -46,23 +53,19 @@ public class SSPInterceptor implements IClientInterceptor {
         iHttpRequest.addHeader("Ssp-TraceID", UUID.randomUUID().toString());
 
 
-      //  System.out.println(iHttpRequest.getUri());
         iHttpRequest.removeHeaders("Accept");
-        iHttpRequest.addHeader("Accept", "application/fhir+json");
-        /*
-        try {
-            System.out.println(iHttpRequest.getRequestBodyFromStream());
-        } catch (Exception ex) {
-
+        if (isDSTU2) {
+            iHttpRequest.addHeader("Accept", "application/json+fhir");
+        } else {
+            iHttpRequest.addHeader("Accept", "application/fhir+json");
         }
 
-         */
 
         Map<String, List<String>> headers = iHttpRequest.getAllHeaders();
         Iterator it = headers.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            //System.out.println(pair.getKey() + " = " + pair.getValue());
+            System.out.println(pair.getKey() + " = " + pair.getValue());
         }
     }
 
