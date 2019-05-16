@@ -51,37 +51,10 @@ public abstract class StructuredRecord {
         CodeableConceptDt code = new CodeableConceptDt();
         code.addCoding()
                 .setSystem("http://fhir.nhs.net/ValueSet/gpconnect-record-section-1")
-                .setCode("ALL");
+                .setCode("SUM");
         param.setValue(code);
 
         return theParameters;
 
-
-        /*
-
-        {
-  "resourceType": "Parameters",
-  "parameter": [
-    {
-      "name": "patientNHSNumber",
-      "valueIdentifier": {
-        "system": "http://fhir.nhs.net/Id/nhs-number",
-        "value": "9658218873"
-      }
-    },
-    {
-      "name": "recordSection",
-      "valueCodeableConcept": {
-        "coding": [
-          {
-            "system": "http://fhir.nhs.net/ValueSet/gpconnect-record-section-1",
-            "code": "ALL"
-          }
-        ]
-      }
-    }
-  ]
-}
-         */
     }
 }

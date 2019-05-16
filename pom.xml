@@ -233,26 +233,34 @@
             <artifactId>hawtio-core</artifactId>
             <version>${hawtio.version}</version>
         </dependency>
-<!--
+
+        <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
         <dependency>
-            <groupId>io.hawt</groupId>
-            <artifactId>hawtio-insight-log</artifactId>
-            <version>1.5.11</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.12.1</version>
         </dependency>
 
+        <!--
+                <dependency>
+                    <groupId>io.hawt</groupId>
+                    <artifactId>hawtio-insight-log</artifactId>
+                    <version>1.5.11</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
 
-        <dependency>
-            <groupId>org.jolokia</groupId>
-            <artifactId>jolokia-core</artifactId>
-        </dependency>
 
-        -->
+                <dependency>
+                    <groupId>org.jolokia</groupId>
+                    <artifactId>jolokia-core</artifactId>
+                </dependency>
+
+                -->
 
     </dependencies>
 

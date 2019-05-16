@@ -71,7 +71,7 @@ public class SSPInterceptor implements IClientInterceptor {
         Iterator it = headers.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry)it.next();
-            System.out.println(pair.getKey() + " = " + pair.getValue());
+          //  System.out.println(pair.getKey() + " = " + pair.getValue());
         }
     }
 
