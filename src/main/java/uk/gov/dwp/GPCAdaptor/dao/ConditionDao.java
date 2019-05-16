@@ -1,6 +1,7 @@
 package uk.gov.dwp.GPCAdaptor.dao;
 
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 
 import ca.uhn.fhir.model.dstu2.resource.Parameters;
@@ -30,12 +31,20 @@ public class ConditionDao implements ICondition {
         List<Condition> conditions = new ArrayList<>();
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),false, false, null);
-        Bundle result = client.operation().onType(Patient.class)
-                .named("$gpc.getcarerecord")
-                .withParameters(parameters)
-                .returnResourceType(Bundle.class)
-                .execute();
+        FhirContext ctx = FhirContext.forDstu2();
+        System.out.println(ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 
+        try {
+            Bundle result = client.operation().onType(Patient.class)
+                    .named("$gpc.getcarerecord")
+                    .withParameters(parameters)
+                    .returnResourceType(Bundle.class)
+                    .encodedJson()
+                    .execute();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            ex.printStackTrace();
+        }
 
         return conditions;
     }

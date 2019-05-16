@@ -25,16 +25,16 @@ public class CreatePayloadDataV0 {
 
 
                 .addObject("requested_record")
-                    .add("resourceType","Organization")
+                    .add("resourceType","Patient")
                     .addArray("identifier")
                         .addObject()
-                            .add("system","http://fhir.nhs.net/Id/ods-organization-code")
-                            .add("value","A11111")
+                            .add("system","http://fhir.nhs.net/Id/nhs-number")
+                            .add("value","9658218873")
                         .end()
                     .end()
                 .end()
 
-                .add("requested_scope", "organization/*.read") //
+                .add("requested_scope", "patient/*.read") //
 
                 .addObject("requesting_device") //
                     .add("resourceType", "Device") //

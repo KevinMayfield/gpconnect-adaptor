@@ -52,6 +52,7 @@ public abstract class StructuredRecord {
         code.addCoding()
                 .setSystem("http://fhir.nhs.net/ValueSet/gpconnect-record-section-1")
                 .setCode("ALL");
+        param.setValue(code);
 
         return theParameters;
 

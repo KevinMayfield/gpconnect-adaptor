@@ -18,7 +18,7 @@ public class SSPInterceptor implements IClientInterceptor {
 
         Boolean isDSTU2 = false;
 
-        System.out.println(iHttpRequest.getUri());
+      //  System.out.println(iHttpRequest.getUri());
         if (iHttpRequest.getHttpVerbName().equals("GET")) {
 
             iHttpRequest.addHeader("Ssp-From", HapiProperties.getGpConnectAsidFrom());
@@ -56,9 +56,15 @@ public class SSPInterceptor implements IClientInterceptor {
         iHttpRequest.removeHeaders("Accept");
         if (isDSTU2) {
             iHttpRequest.addHeader("Accept", "application/json+fhir");
+           // iHttpRequest.removeHeaders("Content-Type");
+            iHttpRequest.removeHeaders("User-Agent");
+            iHttpRequest.removeHeaders("Accept-Charset");
+            iHttpRequest.removeHeaders("Accept-Encoding");
         } else {
             iHttpRequest.addHeader("Accept", "application/fhir+json");
         }
+
+
 
 
         Map<String, List<String>> headers = iHttpRequest.getAllHeaders();
