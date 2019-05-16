@@ -14,9 +14,9 @@ public class CreatePayloadDataV0 {
         JsonObject jsonObject = JsonBuilderFactory.buildObject() //
 
                 // Registered Claims
-                .add("iss", "http://localhost:8182") //
+                .add("iss", "https://orange.testlab.nhs.uk/") //
                 .add("sub", "1") //
-                .add("aud", "https://demo.gov.uk/gpc-adaptor") //
+                .add("aud", "https://authorize.fhir.nhs.net/token") //
                 .add("exp", exp.getTime()/1000) //
                 .add("iat", iat.getTime()/1000) //
 
@@ -26,7 +26,6 @@ public class CreatePayloadDataV0 {
 
                 .addObject("requested_record")
                     .add("resourceType","Organization")
-                    .add("id","1")
                     .addArray("identifier")
                         .addObject()
                             .add("system","http://fhir.nhs.net/Id/ods-organization-code")
@@ -56,7 +55,7 @@ public class CreatePayloadDataV0 {
                     .add("id", "1") //
                     .addArray("identifier") //
                         .addObject()
-                            .add("system","https://fhir.nhs.uk/Id/ods-organization-code") //
+                            .add("system","http://fhir.nhs.net/Id/ods-organization-code") //
                             .add("value","A11111") //
                         .end() //
                     .end()
@@ -76,16 +75,27 @@ public class CreatePayloadDataV0 {
                             .add("value","1") //
                         .end() //
                     .end()
-                    .addArray("name")
-                        .addObject()
-                            .add("family", "Assurance")
+                    .addObject("name")
+
+                         .addArray("family")
+                            .add("Demonstrator")
+                         .end()
+                        .addArray("given")
+                            .add("DWPConnect")
                         .end()
-                        .add(getName("given", "GpConnect"))
-                        .add(getName("prefix", "Ms"))
+                        .addArray("prefix")
+                            .add("Ms")
+                        .end()
                     .end()
                     .addArray("practitionerRole")
                         .addObject()
-                            .addArray("role")
+                            .addObject("role")
+                                .addArray("coding")
+                                    .addObject()
+                                        .add("system","http://fhir.nhs.net/ValueSet/sds-job-role-name-1") //
+                                        .add("value","sds-job-role-name") //
+                                    .end()
+                                .end()
                             .end()
                         .end()
                     .end()
