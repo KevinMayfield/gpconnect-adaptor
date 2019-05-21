@@ -17,8 +17,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import uk.gov.dwp.GPCAdaptor.support.CorsFilter;
-import uk.gov.dwp.GPCAdaptor.support.CreateAuthToken;
-import uk.gov.dwp.GPCAdaptor.support.CreateAuthTokenV0;
 import uk.gov.dwp.GPCAdaptor.support.SSPInterceptor;
 
 @SpringBootApplication
@@ -67,11 +65,11 @@ public class GPCAdaptor {
     @Bean
     @Primary
     public IGenericClient getGPCConnection(FhirContext ctx) {
-        SSPInterceptor interactionIdInterceptor = new SSPInterceptor();
+        SSPInterceptor sspInterceptor = new SSPInterceptor();
 
         IGenericClient client = ctx.newRestfulGenericClient(HapiProperties.getGpConnectServer());
-        client.registerInterceptor(CreateAuthToken.createAuthInterceptor(false));
-        client.registerInterceptor(interactionIdInterceptor);
+     //   client.registerInterceptor(CreateAuthToken.createAuthInterceptor(false));
+        client.registerInterceptor(sspInterceptor );
         return client;
     }
 
@@ -79,11 +77,11 @@ public class GPCAdaptor {
     public IGenericClient getGPCConnectionDSTU2(@Qualifier("CTXDSTU2") FhirContext ctx) {
 
         ctx.getRestfulClientFactory().setServerValidationMode(ServerValidationModeEnum.NEVER);
-        SSPInterceptor interactionIdInterceptor = new SSPInterceptor();
+        SSPInterceptor sspInterceptor = new SSPInterceptor();
 
         IGenericClient client = ctx.newRestfulGenericClient(HapiProperties.getGpConnectServerV0());
-        client.registerInterceptor(CreateAuthTokenV0.createAuthInterceptor(false));
-        client.registerInterceptor(interactionIdInterceptor);
+        //client.registerInterceptor(CreateAuthTokenV0.createAuthInterceptor(false));
+        client.registerInterceptor(sspInterceptor);
         return client;
     }
 

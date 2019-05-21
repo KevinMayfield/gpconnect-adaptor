@@ -10,6 +10,7 @@ public class CreatePayloadDataV0 {
 
     public String buildPayloadData(Date exp, Date iat, boolean write) {
 
+        System.out.println("Payload 0");
 
         return "{\n" +
                 " \"iss\": \"https://orange.testlab.nhs.uk/\",\n" +

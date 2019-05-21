@@ -1,9 +1,9 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11-jdk-alpine
 VOLUME /tmp
 
-ADD target/ccri-messaging.jar ccri-messaging.jar
+ADD target/gpconnect-oauth2-smart.jar gpconnect-oauth2-smart.jar
 
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/ccri-messaging.jar"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/gpconnect-oauth2-smart.jar"]
 

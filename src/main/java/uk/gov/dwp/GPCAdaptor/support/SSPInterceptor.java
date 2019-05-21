@@ -4,15 +4,17 @@ import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IHttpRequest;
 import ca.uhn.fhir.rest.client.api.IHttpResponse;
+import io.jsonwebtoken.Jwts;
 import uk.gov.dwp.GPCAdaptor.HapiProperties;
+import uk.gov.dwp.GPCAdaptor.RestfulServer;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class SSPInterceptor implements IClientInterceptor {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SSPInterceptor.class);
+
     @Override
     public void interceptRequest(IHttpRequest iHttpRequest) {
 
@@ -65,6 +67,35 @@ public class SSPInterceptor implements IClientInterceptor {
         }
 
 
+        if (isDSTU2) {
+            Date exp = new Date(System.currentTimeMillis() + 300000);
+            Date iat = new Date(System.currentTimeMillis());
+
+            // Build registered and custom Claims.
+            CreatePayloadDataV0 createPayloadData = new CreatePayloadDataV0();
+            String jsonString = createPayloadData.buildPayloadData(exp, iat, false);
+            String compactJws = Jwts.builder()
+                    .setHeaderParam("alg", "none")
+                    .setHeaderParam("typ", "JWT")
+                    .setPayload(jsonString)
+                    .compact();
+            log.info("DSTU2 JWT Created");
+            iHttpRequest.addHeader("Authorization", "Bearer " + compactJws);
+        } else {
+            Date exp = new Date(System.currentTimeMillis() + 300000);
+            Date iat = new Date(System.currentTimeMillis());
+
+            // Build registered and custom Claims.
+            CreatePayloadData createPayloadData = new CreatePayloadData();
+            String jsonString = createPayloadData.buildPayloadData(exp, iat, false);
+            String compactJws = Jwts.builder()
+                    .setHeaderParam("alg", "none")
+                    .setHeaderParam("typ", "JWT")
+                    .setPayload(jsonString)
+                    .compact();
+            log.info("STU3 JWT Created");
+            iHttpRequest.addHeader("Authorization", "Bearer " + compactJws);
+        }
 
 
         Map<String, List<String>> headers = iHttpRequest.getAllHeaders();

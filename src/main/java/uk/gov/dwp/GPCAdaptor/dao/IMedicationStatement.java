@@ -13,6 +13,6 @@ import java.util.List;
 public interface IMedicationStatement {
 
 
-    List<MedicationStatement> search(FhirContext ctx, ReferenceParam patient) throws Exception;
+    List<MedicationStatement> search(IGenericClient client, ReferenceParam patient) throws Exception;
 
 }

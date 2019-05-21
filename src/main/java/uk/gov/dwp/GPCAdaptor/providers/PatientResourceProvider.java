@@ -3,6 +3,7 @@ package uk.gov.dwp.GPCAdaptor.providers;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.hl7.fhir.dstu3.model.IdType;
@@ -27,6 +28,9 @@ public class PatientResourceProvider implements IResourceProvider {
     @Autowired
     IPatient patientDao;
 
+    @Autowired
+    IGenericClient client;
+
 
     private static final Logger log = LoggerFactory.getLogger(PatientResourceProvider.class);
 
@@ -40,7 +44,7 @@ public class PatientResourceProvider implements IResourceProvider {
     public Patient read(@IdParam IdType internalId) {
 
 
-        Patient patient = patientDao.read(ctx,internalId);
+        Patient patient = patientDao.read(client, internalId);
         if (patient == null) {
             throw OperationOutcomeFactory.buildOperationOutcomeException(
                     new ResourceNotFoundException("No patient details found for patient ID: " + internalId.getIdPart()),

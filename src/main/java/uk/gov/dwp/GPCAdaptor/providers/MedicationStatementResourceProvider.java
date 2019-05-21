@@ -40,7 +40,7 @@ public class MedicationStatementResourceProvider implements IResourceProvider {
                                                                @OptionalParam(name = MedicationStatement.SP_PATIENT) ReferenceParam patient
     ) throws Exception {
 
-        return resourceDao.search(ctx,patient);
+        return resourceDao.search(client, patient);
 
 
     }
