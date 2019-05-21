@@ -4,7 +4,7 @@ mvn install
 
 docker build . -t gpc-adaptor
 
-docker tag ccri-messaging thorlogic/gpc-adaptor
+docker tag gpc-adaptor thorlogic/gpc-adaptor
 
 docker push thorlogic/gpc-adaptor
 
