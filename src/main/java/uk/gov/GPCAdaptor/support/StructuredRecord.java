@@ -37,7 +37,12 @@ public abstract class StructuredRecord {
         return theParameters;
     }
 
-    public static ca.uhn.fhir.model.dstu2.resource.Parameters getUnStructuredRecordParameters(String nhsNumber,boolean resolevAllergies, boolean prescriptionIssues, DateType fromDate) {
+    public static ca.uhn.fhir.model.dstu2.resource.Parameters getUnStructuredRecordParameters(String nhsNumber,
+                                                                                              String section,
+                                                                                              boolean resolevAllergies,
+                                                                                              boolean prescriptionIssues,
+                                                                                              DateType fromDate
+                                                                                              ) {
         final ca.uhn.fhir.model.dstu2.resource.Parameters theParameters = new ca.uhn.fhir.model.dstu2.resource.Parameters();
         ca.uhn.fhir.model.dstu2.resource.Parameters.Parameter param = theParameters.addParameter();
         param.setName("patientNHSNumber");
@@ -51,7 +56,7 @@ public abstract class StructuredRecord {
         CodeableConceptDt code = new CodeableConceptDt();
         code.addCoding()
                 .setSystem("http://fhir.nhs.net/ValueSet/gpconnect-record-section-1")
-                .setCode("SUM");
+                .setCode(section);
         param.setValue(code);
 
         return theParameters;
