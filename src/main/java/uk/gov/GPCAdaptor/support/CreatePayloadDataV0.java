@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class CreatePayloadDataV0 {
 
-    public String buildPayloadData(Date exp, Date iat, boolean write) {
+    public String buildPayloadData(Date exp, Date iat, String nhsNumber, boolean write) {
 
         System.out.println("Payload 0");
 
@@ -24,7 +24,7 @@ public class CreatePayloadDataV0 {
                 "  \"identifier\": [\n" +
                 "   {\n" +
                 "    \"system\": \"http://fhir.nhs.net/Id/nhs-number\",\n" +
-                "    \"value\": \"9658218873\"\n" +
+                "    \"value\": \""+nhsNumber+"\"\n" +
                 "   }\n" +
                 "  ]\n" +
                 " },\n" +

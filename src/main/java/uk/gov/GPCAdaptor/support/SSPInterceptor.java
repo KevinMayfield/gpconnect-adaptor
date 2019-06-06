@@ -17,6 +17,7 @@ public class SSPInterceptor implements IClientInterceptor {
     public void interceptRequest(IHttpRequest iHttpRequest) {
 
         Boolean isDSTU2 = false;
+        String nhsNumber = "9658218997";
 
       //  System.out.println(iHttpRequest.getUri());
         if (iHttpRequest.getHttpVerbName().equals("GET")) {
@@ -71,7 +72,7 @@ public class SSPInterceptor implements IClientInterceptor {
 
             // Build registered and custom Claims.
             CreatePayloadDataV0 createPayloadData = new CreatePayloadDataV0();
-            String jsonString = createPayloadData.buildPayloadData(exp, iat, false);
+            String jsonString = createPayloadData.buildPayloadData(exp, iat, nhsNumber,false);
             String compactJws = Jwts.builder()
                     .setHeaderParam("alg", "none")
                     .setHeaderParam("typ", "JWT")
