@@ -17,6 +17,8 @@ public class SSPInterceptor implements IClientInterceptor {
     public void interceptRequest(IHttpRequest iHttpRequest) {
 
         Boolean isDSTU2 = false;
+
+        // TODO read payload and retrieve nhsNumber
         String nhsNumber = HapiProperties.getNhsNumber();
         log.info("SSP NHS Number = "+nhsNumber);
 
