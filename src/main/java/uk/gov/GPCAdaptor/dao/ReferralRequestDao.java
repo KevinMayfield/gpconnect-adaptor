@@ -17,6 +17,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.GPCAdaptor.HapiProperties;
 import uk.gov.GPCAdaptor.support.StructuredRecord;
 
 import java.text.SimpleDateFormat;
@@ -32,10 +33,10 @@ public class ReferralRequestDao implements IReferralRequest {
     @Override
     public List<ReferralRequest> search(IGenericClient client, ReferenceParam patient) throws Exception {
 
-
+        String sectionCode="REF";
         List<ReferralRequest> referrals = new ArrayList<>();
 
-        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),"REF",false, false, null);
+        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode,false, false, null);
         FhirContext ctx = FhirContext.forDstu2();
         Bundle result = null;
         try {
@@ -58,7 +59,7 @@ public class ReferralRequestDao implements IReferralRequest {
 
                     for (Composition.Section
                             section : doc.getSection()) {
-                        if (section.getCode().getCodingFirstRep().getCode().equals("REF")) {
+                        if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
                             log.info("Processing Section REF");
                             referrals = extractReferralRequests(section, patient);
                         }
@@ -89,13 +90,13 @@ public class ReferralRequestDao implements IReferralRequest {
             for (org.jsoup.nodes.Element column:columns)
             {
                log.info("th "+f + " - " + column.text());
-                if (f==2) {
-                    if (column.text().equals("Details")) {
-                        problems = true;
-                    } else {
-                        problems = false;
-                    }
+
+                if (column.text().equals("Details")) {
+                    problems = true;
+                } else {
+                    problems = false;
                 }
+
                 f++;
             }
             if (problems) {

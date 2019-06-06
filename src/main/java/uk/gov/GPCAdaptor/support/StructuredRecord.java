@@ -9,6 +9,7 @@ import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.GPCAdaptor.HapiProperties;
 import uk.gov.GPCAdaptor.dao.ReferralRequestDao;
 
 public abstract class StructuredRecord {
@@ -52,6 +53,8 @@ public abstract class StructuredRecord {
         final ca.uhn.fhir.model.dstu2.resource.Parameters theParameters = new ca.uhn.fhir.model.dstu2.resource.Parameters();
         ca.uhn.fhir.model.dstu2.resource.Parameters.Parameter param = theParameters.addParameter();
         log.info("NHS Number = " + nhsNumber);
+
+        HapiProperties.setNhsNumber(nhsNumber);
         param.setName("patientNHSNumber");
         param.setValue(
                 new IdentifierDt()
@@ -65,12 +68,13 @@ public abstract class StructuredRecord {
                 .setSystem("http://fhir.nhs.net/ValueSet/gpconnect-record-section-1")
                 .setCode(section);
         param.setValue(code);
+        /*
         param = theParameters.addParameter();
         param.setName("timePeriod");
         PeriodDt period = new PeriodDt();
 
         param.setValue(period);
-
+*/
         return theParameters;
 
     }

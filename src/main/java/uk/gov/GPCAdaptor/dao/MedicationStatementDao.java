@@ -6,6 +6,7 @@ import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.GPCAdaptor.HapiProperties;
 import uk.gov.GPCAdaptor.support.StructuredRecord;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,6 @@ public class MedicationStatementDao implements IMedicationStatement {
 
 
         List<MedicationStatement> medications = new ArrayList<>();
-
 
         log.trace(patient.getIdPart() );
 

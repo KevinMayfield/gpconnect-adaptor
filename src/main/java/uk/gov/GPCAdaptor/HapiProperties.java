@@ -75,6 +75,16 @@ public class HapiProperties {
 
     private static Properties properties;
 
+    public static String getNhsNumber() {
+        return nhsNumber;
+    }
+
+    public static void setNhsNumber(String nhsNumber) {
+        HapiProperties.nhsNumber = nhsNumber;
+    }
+
+    private static String nhsNumber;
+
     /*
      * Force the configuration to be reloaded
      */

@@ -17,6 +17,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.GPCAdaptor.HapiProperties;
 import uk.gov.GPCAdaptor.support.StructuredRecord;
 
 import java.text.SimpleDateFormat;
@@ -34,8 +35,9 @@ public class EncounterDao implements IEncounter {
 
 
         List<Encounter> encounters = new ArrayList<>();
+        String sectionCode="ENC";
 
-        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),"ENC",false, false, null);
+        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode,false, false, null);
         FhirContext ctx = FhirContext.forDstu2();
         Bundle result = null;
         try {
@@ -58,7 +60,7 @@ public class EncounterDao implements IEncounter {
 
                     for (Composition.Section
                             section : doc.getSection()) {
-                        if (section.getCode().getCodingFirstRep().getCode().equals("ENC")) {
+                        if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
                             log.info("Processing Section ENC");
                             encounters = extractEncounters(section, patient);
                         }
@@ -89,13 +91,13 @@ public class EncounterDao implements IEncounter {
             for (org.jsoup.nodes.Element column:columns)
             {
                log.info("th "+f + " - " + column.text());
-                if (f==2) {
-                    if (column.text().equals("Details")) {
-                        problems = true;
-                    } else {
-                        problems = false;
-                    }
+
+                if (column.text().equals("Details")) {
+                    problems = true;
+                } else {
+                    problems = false;
                 }
+
                 f++;
             }
             if (problems) {

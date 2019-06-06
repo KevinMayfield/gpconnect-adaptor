@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.GPCAdaptor.HapiProperties;
 
 
 @Component
@@ -25,7 +26,6 @@ public class PatientDao implements IPatient {
 
     @Override
     public Patient read(IGenericClient client, IdType internalId) {
-
 
         Bundle result = client.search()
                 .forResource(Patient.class)

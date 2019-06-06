@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
+import uk.gov.GPCAdaptor.HapiProperties;
 import uk.gov.GPCAdaptor.support.StructuredRecord;
 
 import java.text.SimpleDateFormat;
@@ -37,8 +38,9 @@ public class ConditionDao implements ICondition {
 
 
         List<Condition> conditions = new ArrayList<>();
+        String sectionCode="SUM";
 
-        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),"SUM",false, false, null);
+        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode,false, false, null);
         FhirContext ctx = FhirContext.forDstu2();
         Bundle result = null;
         try {
@@ -59,7 +61,7 @@ public class ConditionDao implements ICondition {
                     Composition doc = (Composition) entry.getResource();
                     for (Composition.Section
                             section : doc.getSection()) {
-                        if (section.getCode().getCodingFirstRep().getCode().equals("SUM")) {
+                        if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
                             // System.out.println(section.getText().toString());
                             conditions = extractConditions(section, patient);
                         }

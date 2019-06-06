@@ -17,6 +17,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import uk.gov.GPCAdaptor.HapiProperties;
 import uk.gov.GPCAdaptor.support.StructuredRecord;
 
 import java.text.SimpleDateFormat;
@@ -89,13 +90,13 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
             for (org.jsoup.nodes.Element column:columns)
             {
                log.info("th "+f + " - " + column.text());
-                if (f==2) {
-                    if (column.text().equals("Details")) {
-                        problems = true;
-                    } else {
-                        problems = false;
-                    }
+
+                if (column.text().equals("Details")) {
+                    problems = true;
+                } else {
+                    problems = false;
                 }
+
                 f++;
             }
             if (problems) {
