@@ -105,10 +105,10 @@ public class RestfulServer extends ca.uhn.fhir.rest.server.RestfulServer {
 
         // Create the interceptor and register it
         CorsInterceptor interceptor = new CorsInterceptor(config);
-        registerInterceptor(interceptor);
+        getInterceptorService().registerInterceptor(interceptor);
 
         ServerInterceptor loggingInterceptor = new ServerInterceptor(log);
-        registerInterceptor(loggingInterceptor);
+        getInterceptorService().registerInterceptor(loggingInterceptor);
 
         //ServerInterceptor gatewayInterceptor = new ServerInterceptor(log);
         //registerInterceptor(gatewayInterceptor);
