@@ -59,7 +59,7 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
         CapabilityStatement capabilityStatement = super.getServerConformance(theRequest);
 
 
-        capabilityStatement.setPublisher("NHS Digital");
+
         capabilityStatement.setDateElement(conformanceDate());
         capabilityStatement.setFhirVersion(FhirVersionEnum.DSTU3.getFhirVersionString());
         capabilityStatement.setAcceptUnknown(CapabilityStatement.UnknownContentCode.EXTENSIONS); // TODO: make this configurable - this is a fairly big
@@ -76,7 +76,7 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
         if (capabilityStatement.hasSoftware()) {
             capabilityStatement.getSoftware().setName(HapiProperties.getSoftwareName());
         }
-        capabilityStatement.setPublisher("UK Department of Work and Pensions");
+        capabilityStatement.setPublisher("Gov UK - Department of Work and Pensions");
 
 
 
