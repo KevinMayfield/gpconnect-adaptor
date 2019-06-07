@@ -119,16 +119,23 @@ public class ReferralRequestDao implements IReferralRequest {
                             System.out.println(ex.getMessage());
                         }
                     }
+                    if (g==1) {
+                        ReferralRequest.ReferralRequestRequesterComponent ref = referral.getRequester();
+                        ref.getAgent().setDisplay(column.text());
+                    }
+                    if (g==2) {
+                        Reference ref = referral.addRecipient();
+                        ref.setDisplay(column.text());
+                    }
                     if (g==4) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        referral.addReasonCode(code);
+
+                        referral.setDescription(column.text());
                     }
 
 
                     g++;
                 }
-                if (referral.hasReasonCode())
+                if (referral.hasDescription())
                     referrals.add(referral);
             }
 

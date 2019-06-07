@@ -106,7 +106,7 @@ public class ImmunizationDao implements IImmunization {
                 immunization.setId("#"+h);
                 immunization.setPatient(new Reference
                         ("Patient/"+patient.getIdPart()));
-
+                Immunization.ImmunizationVaccinationProtocolComponent vaccination = immunization.addVaccinationProtocol();
                 h++;
                 Integer g = 0;
                 for (org.jsoup.nodes.Element column : columns) {
@@ -121,15 +121,25 @@ public class ImmunizationDao implements IImmunization {
                         }
                     }
                     if (g==1) {
+                        vaccination.setDescription(column.text());
+                    }
+                    if (g==2) {
+                        try {
+                            Integer seq = Integer.parseInt(column.text());
+                            if (seq > 0) {
+                                vaccination.setDoseSequence(seq);
+                            }
+                        } catch (Exception ex) {
+
+                        }
+
+                    }
+                    if (g==3) {
                         CodeableConcept code = new CodeableConcept();
                         code.setText(column.text());
                         immunization.setVaccineCode(code);
                     }
 
-                    if (g==2) {
-
-                        // immunization.addReason().setText(column.text());
-                    }
                     g++;
                 }
                 if (immunization.hasVaccineCode() )

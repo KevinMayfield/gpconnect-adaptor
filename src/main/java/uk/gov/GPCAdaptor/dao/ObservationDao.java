@@ -7,9 +7,11 @@ import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Composition;
 import ca.uhn.fhir.model.dstu2.resource.Parameters;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
+import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.Observation;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.jsoup.Jsoup;
@@ -112,7 +114,8 @@ public class ObservationDao implements IObservation {
                     if (g==0) {
                         try {
                             Date date = format.parse ( column.text() );
-                            observation.getEffectivePeriod().setStart(date);
+
+                            observation.setEffective(new DateTimeType(date));
                         }
                         catch (Exception ex) {
                             System.out.println(ex.getMessage());
@@ -125,8 +128,16 @@ public class ObservationDao implements IObservation {
                     }
 
                     if (g==2) {
+                        CodeableConcept code = new CodeableConcept();
+                        code.setText(column.text());
+                        observation.setValue(code);
 
-                        // observation.addReason().setText(column.text());
+                    }
+                    if (g==3) {
+                        CodeableConcept code = new CodeableConcept();
+                        code.setText(column.text());
+                        observation.setValue(code);
+
                     }
                     g++;
                 }

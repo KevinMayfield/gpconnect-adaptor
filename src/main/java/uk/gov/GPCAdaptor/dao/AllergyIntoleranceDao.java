@@ -11,6 +11,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.AllergyIntolerance;
+import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -81,7 +82,8 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
 
         Document doc = Jsoup.parse(text.getDivAsString());
         org.jsoup.select.Elements rows = doc.select("tr");
-        Boolean problems = false;
+        Boolean current = false;
+        Boolean past = false;
         Integer h=1;
         for(org.jsoup.nodes.Element row :rows)
         {
@@ -92,41 +94,51 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                log.info("th "+f + " - " + column.text());
 
                 if (column.text().equals("Details")) {
-                    problems = true;
-                } else {
-                    problems = false;
+                    switch (f) {
+                        case 1:
+                            current = true;
+                            break;
+                        case 2:
+                            past = true;
+                            break;
+                        default:
+                            current = false;
+                            past = false;
+                    }
                 }
 
                 f++;
             }
-            if (problems) {
+            if (current) {
                 columns = row.select("td");
                 AllergyIntolerance allergy = new AllergyIntolerance();
+                allergy.setClinicalStatus(AllergyIntolerance.AllergyIntoleranceClinicalStatus.ACTIVE);
+
                 allergy.setId("#"+h);
                 allergy.setPatient(new Reference
                         ("Patient/"+patient.getIdPart()));
 
                 h++;
                 Integer g = 0;
+                Period period = new Period();
+
                 for (org.jsoup.nodes.Element column : columns) {
                    // System.out.print(column.text());
                     if (g==0) {
                         try {
                             Date date = format.parse ( column.text() );
-                            allergy.setAssertedDate(date);
+
+                            period.setStart(date);
                         }
                         catch (Exception ex) {
                             System.out.println(ex.getMessage());
                         }
                     }
-                    if (g==1) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        allergy.setCode(code);
-                    }
 
-                    if (g==2) {
+
+                    if (g==1) {
                         //System.out.println(column.text());
+                        allergy.setOnset(period);
                         allergy.getCode()
                                     .setText(column.text());
                     }
@@ -135,6 +147,55 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                 if (allergy.hasCode() )
                     allergys.add(allergy);
             }
+
+
+            if (past) {
+                columns = row.select("td");
+                AllergyIntolerance allergy = new AllergyIntolerance();
+                allergy.setClinicalStatus(AllergyIntolerance.AllergyIntoleranceClinicalStatus.INACTIVE);
+                allergy.setId("#"+h);
+                allergy.setPatient(new Reference
+                        ("Patient/"+patient.getIdPart()));
+
+                h++;
+                Integer g = 0;
+                Period period = new Period();
+
+                for (org.jsoup.nodes.Element column : columns) {
+                    // System.out.print(column.text());
+                    if (g==0) {
+                        try {
+                            Date date = format.parse ( column.text() );
+
+                            period.setStart(date);
+                        }
+                        catch (Exception ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    }
+                    if (g==1) {
+                        try {
+                            Date date = format.parse ( column.text() );
+
+                            period.setEnd(date);
+                        }
+                        catch (Exception ex) {
+                            System.out.println(ex.getMessage());
+                        }
+                    }
+
+                    if (g==2) {
+                        //System.out.println(column.text());
+                        allergy.setOnset(period);
+                        allergy.getCode()
+                                .setText(column.text());
+                    }
+                    g++;
+                }
+                if (allergy.hasCode() )
+                    allergys.add(allergy);
+            }
+
 
         }
 
