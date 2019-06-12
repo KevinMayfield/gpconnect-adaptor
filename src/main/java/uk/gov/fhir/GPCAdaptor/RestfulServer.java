@@ -11,7 +11,6 @@ import ca.uhn.fhir.util.VersionUtil;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.cors.CorsConfiguration;
-import uk.gov.GPCAdaptor.providers.*;
 
 import uk.gov.fhir.GPCAdaptor.providers.*;
 import uk.gov.fhir.GPCAdaptor.support.ServerInterceptor;
@@ -74,6 +73,7 @@ public class RestfulServer extends ca.uhn.fhir.rest.server.RestfulServer {
         resourceProviders.add(appCtx.getBean(ImmunizationResourceProvider.class));
         resourceProviders.add(appCtx.getBean(ObservationResourceProvider.class));
         resourceProviders.add(appCtx.getBean(ReferralRequestResourceProvider.class));
+        resourceProviders.add(appCtx.getBean(MedicationRequestResourceProvider.class));
 
         setFhirContext(appCtx.getBean(FhirContext.class));
 
