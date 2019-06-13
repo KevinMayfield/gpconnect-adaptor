@@ -20,7 +20,7 @@ public class SSPInterceptor implements IClientInterceptor {
 
         // TODO read payload and retrieve nhsNumber
         String nhsNumber = HapiProperties.getNhsNumber();
-        log.info("SSP NHS Number = "+nhsNumber);
+        log.trace("SSP NHS Number = "+nhsNumber);
 
       //  System.out.println(iHttpRequest.getUri());
         if (iHttpRequest.getHttpVerbName().equals("GET")) {
@@ -81,7 +81,7 @@ public class SSPInterceptor implements IClientInterceptor {
                     .setHeaderParam("typ", "JWT")
                     .setPayload(jsonString)
                     .compact();
-            log.info("DSTU2 JWT Created");
+            log.trace("DSTU2 JWT Created");
             iHttpRequest.addHeader("Authorization", "Bearer " + compactJws);
         } else {
             Date exp = new Date(System.currentTimeMillis() + 300000);
@@ -95,7 +95,7 @@ public class SSPInterceptor implements IClientInterceptor {
                     .setHeaderParam("typ", "JWT")
                     .setPayload(jsonString)
                     .compact();
-            log.info("STU3 JWT Created");
+            log.trace("STU3 JWT Created");
             iHttpRequest.addHeader("Authorization", "Bearer " + compactJws);
         }
 

@@ -1,25 +1,28 @@
 package uk.gov.fhir.GPCAdaptor.dao;
 
+import ca.uhn.fhir.model.api.Include;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.fhir.GPCAdaptor.support.StructuredRecord;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class MedicationStatementDao implements IMedicationStatement {
 
     private static final Logger log = LoggerFactory.getLogger(MedicationStatementDao.class);
 
+    @Autowired
+    IMedicationRequest medicationRequestDAO;
+
     @Override
-    public List<MedicationStatement> search(IGenericClient client, ReferenceParam patient) throws Exception {
-
-
-        List<MedicationStatement> medications = new ArrayList<>();
+    public List<Resource> search(IGenericClient client, ReferenceParam patient,  Set<Include> includes) throws Exception {
 
         log.trace(patient.getIdPart() );
 
@@ -29,12 +32,39 @@ public class MedicationStatementDao implements IMedicationStatement {
                 .withParameters(parameters)
                 .returnResourceType(Bundle.class)
                 .execute();
-       // System.out.println(ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(result));
+
+        List<Resource> resources = extractMedicationStatement(result);
+
+
+        if (includes != null) {
+            for (Include include : includes) {
+                switch (include.getValue()) {
+                    case "MedicationStatement:medication":
+                        resources.addAll(extractMedication(result));
+                        break;
+                    case "MedicationStatement:based-on":
+                        resources.addAll(medicationRequestDAO.extractMedicationRequest(result));
+                        break;
+                    case "*":
+                        //log.info(String.valueOf(resources.size()));
+                        resources.addAll(medicationRequestDAO.extractMedicationRequest(result));
+                        //log.info(String.valueOf(resources.size()));
+                        resources.addAll(extractMedication(result));
+                        //log.info(String.valueOf(resources.size()));
+                        break;
+                }
+            }
+        }
+
+        return resources;
+    }
+
+    public List<Resource> extractMedicationStatement(Bundle result) {
+        List<Resource> medications = new ArrayList<>();
         for(Bundle.BundleEntryComponent entry : result.getEntry()) {
             if (entry.getResource() instanceof MedicationStatement) {
                 MedicationStatement statement = (MedicationStatement) entry.getResource();
                 if (statement.hasMedicationReference() && statement.getMedicationReference().getDisplay() == null) {
-                    // Attempt to make the MedicationStatement more useful to calling systems.
                     Medication medication = getMedication(statement,result);
                     if (medication != null) {
                         if (medication.hasCode()) {
@@ -48,6 +78,16 @@ public class MedicationStatementDao implements IMedicationStatement {
                     }
                 }
                 medications.add(statement);
+            }
+        }
+        return medications;
+    }
+
+    public List<Resource> extractMedication(Bundle result) {
+        List<Resource> medications = new ArrayList<>();
+        for(Bundle.BundleEntryComponent entry : result.getEntry()) {
+            if (entry.getResource() instanceof Medication) {
+                medications.add(entry.getResource());
             }
         }
         return medications;

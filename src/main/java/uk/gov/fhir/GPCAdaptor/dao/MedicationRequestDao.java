@@ -17,10 +17,10 @@ public class MedicationRequestDao implements IMedicationRequest {
     private static final Logger log = LoggerFactory.getLogger(MedicationRequestDao.class);
 
     @Override
-    public List<MedicationRequest> search(IGenericClient client, ReferenceParam patient) throws Exception {
+    public List<Resource> search(IGenericClient client, ReferenceParam patient) throws Exception {
 
 
-        List<MedicationRequest> medications = new ArrayList<>();
+
 
         log.trace(patient.getIdPart() );
 
@@ -30,7 +30,12 @@ public class MedicationRequestDao implements IMedicationRequest {
                 .withParameters(parameters)
                 .returnResourceType(Bundle.class)
                 .execute();
-       // System.out.println(ctx.newJsonParser().setPrettyPrint(true).encodeResourceToString(result));
+        return extractMedicationRequest(result);
+    }
+
+    public List<Resource> extractMedicationRequest(Bundle result) {
+        List<Resource> medications = new ArrayList<>();
+
         for(Bundle.BundleEntryComponent entry : result.getEntry()) {
             if (entry.getResource() instanceof MedicationRequest) {
                 MedicationRequest prescription = (MedicationRequest) entry.getResource();
@@ -48,11 +53,22 @@ public class MedicationRequestDao implements IMedicationRequest {
                         }
                     }
                 }
+                if (prescription.hasRecorder() && prescription.getRecorder().getDisplay() == null) {
+                    // Attempt to make the MedicationRequest more useful to calling systems.
+                    Practitioner practitioner = getPractitioner(prescription.getRecorder(),result);
+                    if (practitioner != null) {
+                        if (practitioner.hasName()) {
+                               prescription.getRecorder().setDisplay(practitioner.getNameFirstRep().getNameAsSingleString());
+                        }
+                    }
+                }
                 medications.add(prescription);
             }
         }
         return medications;
     }
+
+
 
     private Medication getMedication(MedicationRequest prescription, Bundle result) {
 
@@ -69,5 +85,24 @@ public class MedicationRequestDao implements IMedicationRequest {
 
         return null;
     }
+
+    private Practitioner getPractitioner(Reference reference, Bundle result) {
+
+        for (Bundle.BundleEntryComponent entry : result.getEntry()) {
+            if (entry.getResource() instanceof Practitioner) {
+
+                Practitioner prac = (Practitioner) entry.getResource();
+
+                if (reference.hasReference()) {
+                    if (reference.getReference().equals("Practitioner/"+ prac.getIdElement().getIdPart())) {
+                        return prac;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
 
 }

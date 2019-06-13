@@ -7,6 +7,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import org.hl7.fhir.dstu3.model.MedicationRequest;
+import org.hl7.fhir.dstu3.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,8 @@ public class MedicationRequestResourceProvider implements IResourceProvider {
 
 
     @Search
-    public List<MedicationRequest> search(HttpServletRequest httpRequest,
-                                                               @OptionalParam(name = MedicationRequest.SP_PATIENT) ReferenceParam patient
+    public List<Resource> search(HttpServletRequest httpRequest,
+                                 @OptionalParam(name = MedicationRequest.SP_PATIENT) ReferenceParam patient
     ) throws Exception {
 
         return resourceDao.search(client, patient);
