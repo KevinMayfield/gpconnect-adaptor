@@ -109,6 +109,8 @@ public class GPCAdaptor {
         bean.setOrder(0);
         return bean;
     }
+
+    /*
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -130,6 +132,6 @@ public class GPCAdaptor {
                 Collections.emptyList()
         );
     }
-
+*/
 
 }
