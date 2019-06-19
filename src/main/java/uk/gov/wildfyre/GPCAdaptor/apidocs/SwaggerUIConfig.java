@@ -1,4 +1,4 @@
-package uk.gov.wildfyre.GPCAdaptor;
+package uk.gov.wildfyre.GPCAdaptor.apidocs;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

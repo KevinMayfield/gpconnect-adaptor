@@ -1,4 +1,4 @@
-package uk.gov.wildfyre.GPCAdaptor.support;
+package uk.gov.wildfyre.GPCAdaptor.interceptor;
 
 import java.util.Date;
 

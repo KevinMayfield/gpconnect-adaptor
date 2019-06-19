@@ -1,7 +1,8 @@
-package uk.gov.wildfyre.GPCAdaptor;
+package uk.gov.wildfyre.GPCAdaptor.apidocs;
 
 import org.springframework.stereotype.Component;
 import springfox.documentation.swagger.web.SwaggerResource;
+import uk.gov.wildfyre.GPCAdaptor.HapiProperties;
 
 import java.util.ArrayList;
 import java.util.List;
