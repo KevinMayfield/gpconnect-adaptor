@@ -1,4 +1,4 @@
-package uk.gov.wildfyre.GPCAdaptor.support;
+package uk.gov.wildfyre.GPCAdaptor.interceptor;
 
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IHttpRequest;

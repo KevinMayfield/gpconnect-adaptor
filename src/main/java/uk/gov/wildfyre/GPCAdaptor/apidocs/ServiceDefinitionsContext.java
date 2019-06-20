@@ -1,7 +1,8 @@
-package uk.gov.wildfyre.GPCAdaptor;
+package uk.gov.wildfyre.GPCAdaptor.apidocs;
 
 import org.springframework.stereotype.Component;
 import springfox.documentation.swagger.web.SwaggerResource;
+import uk.gov.wildfyre.GPCAdaptor.HapiProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class ServiceDefinitionsContext {
 
         List<SwaggerResource> resources = new ArrayList<>();
         SwaggerResource resource = new SwaggerResource();
-        resource.setLocation("/openapi" );
+        resource.setLocation("/apidocs" );
         resource.setName(HapiProperties.getServerName());
         resource.setSwaggerVersion("2.0");
         resources.add(resource);

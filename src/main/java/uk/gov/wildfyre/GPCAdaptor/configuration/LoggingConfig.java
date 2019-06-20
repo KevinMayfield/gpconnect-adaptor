@@ -1,4 +1,4 @@
-package uk.gov.wildfyre.GPCAdaptor;
+package uk.gov.wildfyre.GPCAdaptor.configuration;
 
 import org.springframework.context.annotation.Configuration;
 

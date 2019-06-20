@@ -16,17 +16,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.gov.wildfyre.GPCAdaptor.support.CorsFilter;
-import uk.gov.wildfyre.GPCAdaptor.support.SSPInterceptor;
-
-import java.util.Collections;
+import uk.gov.wildfyre.GPCAdaptor.interceptor.SSPInterceptor;
 
 @SpringBootApplication
 @EnableSwagger2
