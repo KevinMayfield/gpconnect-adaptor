@@ -33,6 +33,9 @@ public class ObservationDao implements IObservation {
     @Override
     public List<Observation> search(IGenericClient client, ReferenceParam patient) throws Exception {
 
+        if (patient == null) {
+            return null;
+        }
         String sectionCode="OBS";
         List<Observation> observations = new ArrayList<>();
 

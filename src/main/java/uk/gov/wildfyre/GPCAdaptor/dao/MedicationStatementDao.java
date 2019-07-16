@@ -24,6 +24,9 @@ public class MedicationStatementDao implements IMedicationStatement {
     @Override
     public List<Resource> search(IGenericClient client, ReferenceParam patient,  Set<Include> includes) throws Exception {
 
+        if (patient == null) {
+            return null;
+        }
         log.trace(patient.getIdPart() );
 
         Parameters parameters = StructuredRecord.getStructuredRecordParameters(patient.getValue(),false, false, new DateType(1980, 5, 5));

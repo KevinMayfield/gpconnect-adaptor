@@ -31,6 +31,9 @@ public class ReferralRequestDao implements IReferralRequest {
     @Override
     public List<ReferralRequest> search(IGenericClient client, ReferenceParam patient) throws Exception {
 
+        if (patient == null) {
+            return null;
+        }
         String sectionCode="REF";
         List<ReferralRequest> referrals = new ArrayList<>();
 

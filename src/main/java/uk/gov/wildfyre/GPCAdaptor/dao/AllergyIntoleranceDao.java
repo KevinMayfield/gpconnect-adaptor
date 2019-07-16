@@ -32,7 +32,9 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
     @Override
     public List<AllergyIntolerance> search(IGenericClient client, ReferenceParam patient) throws Exception {
 
-
+        if (patient == null) {
+            return null;
+        }
         List<AllergyIntolerance> allergys = new ArrayList<>();
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),"ALL",false, false, null);

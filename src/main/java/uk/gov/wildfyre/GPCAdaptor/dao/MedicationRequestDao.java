@@ -19,7 +19,9 @@ public class MedicationRequestDao implements IMedicationRequest {
     @Override
     public List<Resource> search(IGenericClient client, ReferenceParam patient) throws Exception {
 
-
+        if (patient == null) {
+            return null;
+        }
 
 
         log.trace(patient.getIdPart() );

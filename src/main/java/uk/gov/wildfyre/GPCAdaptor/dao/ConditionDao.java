@@ -38,6 +38,9 @@ public class ConditionDao implements ICondition {
 
         List<Condition> conditions = new ArrayList<>();
         String sectionCode="SUM";
+        if (patient == null) {
+            return null;
+        }
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode,false, false, null);
         FhirContext ctx = FhirContext.forDstu2();

@@ -77,7 +77,7 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
         if (capabilityStatement.getImplementationGuide().size() == 0) {
             capabilityStatement.getImplementationGuide().add(new UriType(HapiProperties.getSoftwareImplementationGuide()));
         }
-        capabilityStatement.setPublisher("NHS Digital & Dept for Work and Pensions");
+        capabilityStatement.setPublisher("NHS Digital & DWP Digital");
 
         capabilityStatement.setStatus(Enumerations.PublicationStatus.ACTIVE);
         /*

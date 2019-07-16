@@ -35,6 +35,9 @@ public class EncounterDao implements IEncounter {
 
         List<Encounter> encounters = new ArrayList<>();
         String sectionCode="ENC";
+        if (patient == null) {
+            return null;
+        }
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode,false, false, null);
         FhirContext ctx = FhirContext.forDstu2();

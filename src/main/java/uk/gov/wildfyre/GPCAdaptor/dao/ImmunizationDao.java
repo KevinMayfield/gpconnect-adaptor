@@ -35,6 +35,9 @@ public class ImmunizationDao implements IImmunization {
 
         List<Immunization> immunizations = new ArrayList<>();
         String sectionCode="IMM";
+        if (patient == null) {
+            return null;
+        }
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode,false, false, null);
         FhirContext ctx = FhirContext.forDstu2();
