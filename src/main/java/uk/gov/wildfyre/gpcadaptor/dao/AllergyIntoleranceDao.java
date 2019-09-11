@@ -49,7 +49,7 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
 
     private List<AllergyIntolerance> processBundle(Bundle result, ReferenceParam patient)
     {
-        List<AllergyIntolerance> allergys = new ArrayList<>();
+        List<AllergyIntolerance> allergys = null;
         if (result != null) {
             for (Bundle.Entry entry : result.getEntry()) {
                 if (entry.getResource() instanceof Composition) {

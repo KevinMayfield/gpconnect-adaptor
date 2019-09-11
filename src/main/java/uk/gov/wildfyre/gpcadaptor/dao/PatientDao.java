@@ -32,32 +32,41 @@ public class PatientDao implements IPatient {
             if (entry.getResource() instanceof Patient) {
                 Patient patient = (Patient) entry.getResource();
 
-                if (patient.hasManagingOrganization()) {
-                    Organization surgery = organisationDao.read(client,new IdType().setValue(patient.getManagingOrganization().getReference()));
-                    if (surgery != null) {
-                        Reference ref =patient.getManagingOrganization();
-                        if (surgery.hasIdentifier()) {
-                            ref.setIdentifier(surgery.getIdentifierFirstRep());
-                        }
-                        ref.setDisplay(surgery.getName());
-                    }
-                }
-                if (patient.hasGeneralPractitioner()) {
-                    Practitioner gp = practitionerDao.read(client,new IdType().setValue(patient.getGeneralPractitionerFirstRep().getReference()));
-                    if (gp !=null) {
-                        Reference ref = patient.getGeneralPractitionerFirstRep();
-                        if (gp.hasIdentifier()) {
-                            ref.setIdentifier(gp.getIdentifierFirstRep());
-                        }
-                        if (gp.hasName())
-                            ref.setDisplay(gp.getNameFirstRep().getNameAsSingleString());
-                    }
-                }
+                processPractice(patient, client);
+                processGP(patient, client);
+
                 return  patient;
             }
         }
 
         return null;
+    }
+
+    private void processGP(Patient patient, IGenericClient client) {
+        if (patient.hasGeneralPractitioner()) {
+            Practitioner gp = practitionerDao.read(client,new IdType().setValue(patient.getGeneralPractitionerFirstRep().getReference()));
+            if (gp !=null) {
+                Reference ref = patient.getGeneralPractitionerFirstRep();
+                if (gp.hasIdentifier()) {
+                    ref.setIdentifier(gp.getIdentifierFirstRep());
+                }
+                if (gp.hasName())
+                    ref.setDisplay(gp.getNameFirstRep().getNameAsSingleString());
+            }
+        }
+    }
+
+    private void processPractice(Patient patient, IGenericClient client) {
+        if (patient.hasManagingOrganization()) {
+            Organization surgery = organisationDao.read(client,new IdType().setValue(patient.getManagingOrganization().getReference()));
+            if (surgery != null) {
+                Reference ref =patient.getManagingOrganization();
+                if (surgery.hasIdentifier()) {
+                    ref.setIdentifier(surgery.getIdentifierFirstRep());
+                }
+                ref.setDisplay(surgery.getName());
+            }
+        }
     }
 
 

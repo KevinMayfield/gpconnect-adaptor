@@ -26,14 +26,17 @@ import java.util.List;
 @Component
 public class ConditionDao implements ICondition {
 
+    SimpleDateFormat
+            format = new SimpleDateFormat("dd-MMM-yyyy");
+
     @Override
     public List<Condition> search(IGenericClient client, ReferenceParam patient)  {
 
-        List<Condition> conditions = new ArrayList<>();
-        String sectionCode="SUM";
+
         if (patient == null) {
             return Collections.emptyList();
         }
+        String sectionCode="SUM";
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode);
         Bundle result = null;
         try {
@@ -45,17 +48,18 @@ public class ConditionDao implements ICondition {
                     .execute();
         } catch (Exception ignored) {
         }
+        return processBundle(result, patient, sectionCode);
+    }
+
+    private List<Condition> processBundle(Bundle result, ReferenceParam patient, String sectionCode) {
+
+        List<Condition> conditions = new ArrayList<>();
 
         if (result != null && result.getEntry().isEmpty()) {
             for (Bundle.Entry entry : result.getEntry()) {
                 if (entry.getResource() instanceof Composition) {
                     Composition doc = (Composition) entry.getResource();
-                    for (Composition.Section
-                            section : doc.getSection()) {
-                        if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
-                            conditions = extractConditions(section, patient);
-                        }
-                    }
+                    processSections(conditions, doc, sectionCode, patient);
                 }
             }
         }
@@ -63,12 +67,17 @@ public class ConditionDao implements ICondition {
         return conditions;
     }
 
-    private List<Condition> extractConditions(Composition.Section section,ReferenceParam patient) {
-        List<Condition> conditions = new ArrayList<>();
+    private void processSections(List<Condition> conditions, Composition doc, String sectionCode,ReferenceParam patient) {
+        for (Composition.Section section : doc.getSection()) {
+            if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
+                extractConditions(conditions, section, patient);
+            }
+        }
+    }
+
+    private List<Condition> extractConditions(List<Condition> conditions, Composition.Section section,ReferenceParam patient) {
 
         NarrativeDt text = section.getText();
-        SimpleDateFormat
-                format = new SimpleDateFormat("dd-MMM-yyyy");
 
         Document doc = Jsoup.parse(text.getDivAsString());
         org.jsoup.select.Elements rows = doc.select("tr");
@@ -91,40 +100,8 @@ public class ConditionDao implements ICondition {
                 f++;
             }
             if (problems) {
-                columns = row.select("td");
-                Condition condition = new Condition();
-                condition.setId("#"+h);
-                condition.setSubject(new Reference
-                        ("Patient/"+patient.getIdPart()));
-                condition.setClinicalStatus(Condition.ConditionClinicalStatus.ACTIVE);
-                h++;
-                int g = 0;
-                for (org.jsoup.nodes.Element column : columns) {
-
-                    if (g==0) {
-                        try {
-                            Date date = format.parse ( column.text() );
-                            condition.setAssertedDate(date);
-                        }
-                        catch (Exception ignored) {
-                        }
-                    }
-                    if (g==1) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        condition.setCode(code);
-                    }
-                    if (g==2 && column.text().contains("Major")) {
-                            condition.getSeverity()
-                                    .addCoding()
-                                    .setSystem("http://snomed.info/sct")
-                                    .setCode("24484000")
-                                    .setDisplay("Severe");
-
-                    }
-                    g++;
-                }
-                if (condition.getCode() != null && condition.getCode().getText() != null) conditions.add(condition);
+              processProblem(row, h, patient, conditions);
+              h++;
             }
 
         }
@@ -132,6 +109,47 @@ public class ConditionDao implements ICondition {
         return conditions;
     }
 
+    private void processProblem(org.jsoup.nodes.Element row, int h, ReferenceParam patient, List<Condition> conditions) {
+        org.jsoup.select.Elements columns = row.select("td");
+        Condition condition = new Condition();
+        condition.setId("#"+h);
+        condition.setSubject(new Reference
+                ("Patient/"+patient.getIdPart()));
+
+
+        processProblemEntries(columns, condition);
+        if (condition.getCode() != null && condition.getCode().getText() != null) conditions.add(condition);
+    }
+    private void processProblemEntries(org.jsoup.select.Elements columns, Condition condition) {
+        condition.setClinicalStatus(Condition.ConditionClinicalStatus.ACTIVE);
+        int g = 0;
+        for (org.jsoup.nodes.Element column : columns) {
+
+            if (g==0) {
+                try {
+                    Date date = format.parse ( column.text() );
+                    condition.setAssertedDate(date);
+                }
+                catch (Exception ignored) {
+                }
+            }
+            if (g==1) {
+                CodeableConcept code = new CodeableConcept();
+                code.setText(column.text());
+                condition.setCode(code);
+            }
+            if (g==2 && column.text().contains("Major")) {
+                condition.getSeverity()
+                        .addCoding()
+                        .setSystem("http://snomed.info/sct")
+                        .setCode("24484000")
+                        .setDisplay("Severe");
+
+            }
+            g++;
+        }
+
+    }
 }
 
 

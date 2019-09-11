@@ -29,11 +29,15 @@ public class ImmunizationDao implements IImmunization {
 
     private static final Logger log = LoggerFactory.getLogger(ImmunizationDao.class);
 
+    SimpleDateFormat
+            format = new SimpleDateFormat("dd-MMM-yyyy");
+
+
     @Override
     public List<Immunization> search(IGenericClient client, ReferenceParam patient)  {
 
 
-        List<Immunization> immunizations = new ArrayList<>();
+
         String sectionCode="IMM";
         if (patient == null) {
             return Collections.emptyList();
@@ -53,6 +57,11 @@ public class ImmunizationDao implements IImmunization {
 
         }
 
+        return processResult(result,sectionCode,patient);
+    }
+
+    private List<Immunization> processResult(Bundle result, String sectionCode, ReferenceParam patient) {
+        List<Immunization> immunizations = new ArrayList<>();
         if (result != null) {
             for (Bundle.Entry entry : result.getEntry()) {
                 if (entry.getResource() instanceof Composition) {
@@ -70,7 +79,6 @@ public class ImmunizationDao implements IImmunization {
             }
 
         }
-
         return immunizations;
     }
 
@@ -78,8 +86,6 @@ public class ImmunizationDao implements IImmunization {
         List<Immunization> immunizations = new ArrayList<>();
 
         NarrativeDt text = section.getText();
-        SimpleDateFormat
-                format = new SimpleDateFormat("dd-MMM-yyyy");
 
         Document doc = Jsoup.parse(text.getDivAsString());
         org.jsoup.select.Elements rows = doc.select("tr");
@@ -87,69 +93,83 @@ public class ImmunizationDao implements IImmunization {
         int h=1;
         for(org.jsoup.nodes.Element row :rows)
         {
-            org.jsoup.select.Elements columns = row.select("th");
-
+            org.jsoup.select.Elements columns =row.select("th");
             for (org.jsoup.nodes.Element column:columns)
             {
 
-
-                    if (column.text().equals("Details")) {
-                        problems = true;
-                    } else {
-                        problems = false;
-                    }
-
+                if (column.text().equals("Details")) {
+                    problems = true;
+                } else {
+                    problems = false;
+                }
 
             }
-            if (problems) {
-                columns = row.select("td");
-                Immunization immunization = new Immunization();
-                immunization.setId("#"+h);
-                immunization.setPatient(new Reference
-                        ("Patient/"+patient.getIdPart()));
-                Immunization.ImmunizationVaccinationProtocolComponent vaccination = immunization.addVaccinationProtocol();
-                h++;
-                int g = 0;
-                for (org.jsoup.nodes.Element column : columns) {
+             processColumns( row, problems, patient, h, immunizations);
+             h++;
 
-                    if (g==0) {
-                        try {
-                            Date date = format.parse ( column.text() );
-                            immunization.setDate(date);
-                        }
-                        catch (Exception ignore) {
+        }
+        return immunizations;
+    }
 
-                        }
-                    }
-                    if (g==1) {
-                        vaccination.setDescription(column.text());
-                    }
-                    if (g==2) {
-                        try {
-                            int seq = Integer.parseInt(column.text());
-                            if (seq > 0) {
-                                vaccination.setDoseSequence(seq);
-                            }
-                        } catch (Exception ignore) {
+    private void processColumns(
+                                org.jsoup.nodes.Element row,
+                                boolean problems,
+                                ReferenceParam patient,
+                                int h,
+                                List<Immunization> immunizations) {
 
-                        }
+        if (problems) {
+            org.jsoup.select.Elements columns = row.select("td");
+            Immunization immunization = new Immunization();
+            immunization.setId("#"+h);
+            immunization.setPatient(new Reference
+                    ("Patient/"+patient.getIdPart()));
+            Immunization.ImmunizationVaccinationProtocolComponent vaccination = immunization.addVaccinationProtocol();
 
-                    }
-                    if (g==3) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        immunization.setVaccineCode(code);
-                    }
+            int g = 0;
+            for (org.jsoup.nodes.Element column : columns) {
 
-                    g++;
+                processCols(immunization, column, g, vaccination);
+                g++;
+            }
+            if (immunization.hasVaccineCode() )
+                immunizations.add(immunization);
+        }
+
+    }
+    private void processCols(Immunization immunization,
+                             org.jsoup.nodes.Element column,
+                             int g,
+                             Immunization.ImmunizationVaccinationProtocolComponent vaccination){
+        if (g==0) {
+            try {
+                Date date = format.parse ( column.text() );
+                immunization.setDate(date);
+            }
+            catch (Exception ignore) {
+
+            }
+        }
+        if (g==1) {
+            vaccination.setDescription(column.text());
+        }
+        if (g==2) {
+            try {
+                int seq = Integer.parseInt(column.text());
+                if (seq > 0) {
+                    vaccination.setDoseSequence(seq);
                 }
-                if (immunization.hasVaccineCode() )
-                    immunizations.add(immunization);
+            } catch (Exception ignore) {
+
             }
 
         }
+        if (g==3) {
+            CodeableConcept code = new CodeableConcept();
+            code.setText(column.text());
+            immunization.setVaccineCode(code);
+        }
 
-        return immunizations;
     }
 
 }

@@ -21,6 +21,10 @@ import java.util.List;
 
 @Component
 public class ObservationDao implements IObservation {
+
+    SimpleDateFormat
+            format = new SimpleDateFormat("dd-MMM-yyyy");
+
     @Override
     public List<Observation> search(IGenericClient client, ReferenceParam patient)  {
 
@@ -69,8 +73,7 @@ public class ObservationDao implements IObservation {
         List<Observation> observations = new ArrayList<>();
 
         NarrativeDt text = section.getText();
-        SimpleDateFormat
-                format = new SimpleDateFormat("dd-MMM-yyyy");
+
 
         Document doc = Jsoup.parse(text.getDivAsString());
         org.jsoup.select.Elements rows = doc.select("tr");
@@ -101,34 +104,7 @@ public class ObservationDao implements IObservation {
                 int g = 0;
                 for (org.jsoup.nodes.Element column : columns) {
 
-                    if (g==0) {
-                        try {
-                            Date date = format.parse ( column.text() );
-
-                            observation.setEffective(new DateTimeType(date));
-                        }
-                        catch (Exception ignore) {
-
-                        }
-                    }
-                    if (g==1) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        observation.setCode(code);
-                    }
-
-                    if (g==2) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        observation.setValue(code);
-
-                    }
-                    if (g==3) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        observation.setValue(code);
-
-                    }
+                    processCols(observation,column,g);
                     g++;
                 }
                 if (observation.hasCode() )
@@ -140,6 +116,39 @@ public class ObservationDao implements IObservation {
         return observations;
     }
 
+
+    private void processCols(Observation observation,
+                             org.jsoup.nodes.Element column,
+                             int g) {
+        if (g==0) {
+            try {
+                Date date = format.parse ( column.text() );
+
+                observation.setEffective(new DateTimeType(date));
+            }
+            catch (Exception ignore) {
+
+            }
+        }
+        if (g==1) {
+            CodeableConcept code = new CodeableConcept();
+            code.setText(column.text());
+            observation.setCode(code);
+        }
+
+        if (g==2) {
+            CodeableConcept code = new CodeableConcept();
+            code.setText(column.text());
+            observation.setValue(code);
+
+        }
+        if (g==3) {
+            CodeableConcept code = new CodeableConcept();
+            code.setText(column.text());
+            observation.setValue(code);
+
+        }
+    }
 }
 
 

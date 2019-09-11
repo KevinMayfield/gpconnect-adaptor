@@ -67,22 +67,28 @@ public class MedicationStatementDao implements IMedicationStatement {
         for(Bundle.BundleEntryComponent entry : result.getEntry()) {
             if (entry.getResource() instanceof MedicationStatement) {
                 MedicationStatement statement = (MedicationStatement) entry.getResource();
-                if (statement.hasMedicationReference() && statement.getMedicationReference().getDisplay() == null) {
-                    Medication medication = getMedication(statement,result);
-                    if (medication != null && medication.hasCode()) {
-                            if (medication.getCode().hasCoding()) {
-                                statement.getMedicationReference().setDisplay(medication.getCode().getCoding().get(0).getDisplay());
-                            }
-                            else {
-                                statement.getMedicationReference().setDisplay(medication.getCode().getText());
-                            }
 
-                    }
-                }
+                processMedicationReference(statement,result);
+
                 medications.add(statement);
             }
         }
         return medications;
+    }
+
+    private void processMedicationReference(MedicationStatement statement, Bundle result) {
+        if (statement.hasMedicationReference() && statement.getMedicationReference().getDisplay() == null) {
+            Medication medication = getMedication(statement,result);
+            if (medication != null && medication.hasCode()) {
+                if (medication.getCode().hasCoding()) {
+                    statement.getMedicationReference().setDisplay(medication.getCode().getCoding().get(0).getDisplay());
+                }
+                else {
+                    statement.getMedicationReference().setDisplay(medication.getCode().getText());
+                }
+
+            }
+        }
     }
 
     public List<Resource> extractMedication(Bundle result) {

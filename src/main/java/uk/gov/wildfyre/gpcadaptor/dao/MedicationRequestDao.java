@@ -42,20 +42,9 @@ public class MedicationRequestDao implements IMedicationRequest {
         for(Bundle.BundleEntryComponent entry : result.getEntry()) {
             if (entry.getResource() instanceof MedicationRequest) {
                 MedicationRequest prescription = (MedicationRequest) entry.getResource();
-                if (prescription.hasMedicationReference()
-                        && prescription.getMedicationReference().getDisplay() == null) {
-                    // Attempt to make the MedicationRequest more useful to calling systems.
-                    Medication medication = getMedication(prescription,result);
-                    if (medication != null && medication.hasCode()) {
-                            if (medication.getCode().hasCoding()) {
-                                prescription.getMedicationReference().setDisplay(medication.getCode().getCoding().get(0).getDisplay());
-                            }
-                            else {
-                                prescription.getMedicationReference().setDisplay(medication.getCode().getText());
-                            }
 
-                    }
-                }
+                processMedicationReference(prescription, result);
+
                 if (prescription.hasRecorder() && prescription.getRecorder().getDisplay() == null) {
                     // Attempt to make the MedicationRequest more useful to calling systems.
                     Practitioner practitioner = getPractitioner(prescription.getRecorder(),result);
@@ -70,6 +59,22 @@ public class MedicationRequestDao implements IMedicationRequest {
         return medications;
     }
 
+    private void processMedicationReference(MedicationRequest prescription, Bundle result) {
+        if (prescription.hasMedicationReference()
+                && prescription.getMedicationReference().getDisplay() == null) {
+            // Attempt to make the MedicationRequest more useful to calling systems.
+            Medication medication = getMedication(prescription,result);
+            if (medication != null && medication.hasCode()) {
+                if (medication.getCode().hasCoding()) {
+                    prescription.getMedicationReference().setDisplay(medication.getCode().getCoding().get(0).getDisplay());
+                }
+                else {
+                    prescription.getMedicationReference().setDisplay(medication.getCode().getText());
+                }
+
+            }
+        }
+    }
 
 
     private Medication getMedication(MedicationRequest prescription, Bundle result) {

@@ -27,6 +27,10 @@ public class ReferralRequestDao implements IReferralRequest {
 
     private static final Logger log = LoggerFactory.getLogger(ReferralRequestDao.class);
 
+    SimpleDateFormat
+            format = new SimpleDateFormat("dd-MMM-yyyy");
+
+
     @Override
     public List<ReferralRequest> search(IGenericClient client, ReferenceParam patient) {
 
@@ -78,8 +82,6 @@ public class ReferralRequestDao implements IReferralRequest {
         List<ReferralRequest> referrals = new ArrayList<>();
 
         NarrativeDt text = section.getText();
-        SimpleDateFormat
-                format = new SimpleDateFormat("dd-MMM-yyyy");
 
         Document doc = Jsoup.parse(text.getDivAsString());
         org.jsoup.select.Elements rows = doc.select("tr");
@@ -99,47 +101,55 @@ public class ReferralRequestDao implements IReferralRequest {
                 }
             }
             if (problems) {
-                columns = row.select("td");
-                ReferralRequest referral = new ReferralRequest();
-                referral.setId("#"+h);
-                referral.setSubject(new Reference
-                        ("Patient/"+patient.getIdPart()));
-
+                processProblems(row, h, patient, referrals);
                 h++;
-                int g = 0;
-                for (org.jsoup.nodes.Element column : columns) {
-                    if (g==0) {
-                        try {
-                            Date date = format.parse ( column.text() );
-                            referral.setAuthoredOn(date);
-                        }
-                        catch (Exception ignore) {
-
-                        }
-                    }
-                    if (g==1) {
-                        ReferralRequest.ReferralRequestRequesterComponent ref = referral.getRequester();
-                        ref.getAgent().setDisplay(column.text());
-                    }
-                    if (g==2) {
-                        Reference ref = referral.addRecipient();
-                        ref.setDisplay(column.text());
-                    }
-                    if (g==4) {
-
-                        referral.setDescription(column.text());
-                    }
-
-
-                    g++;
-                }
-                if (referral.hasDescription())
-                    referrals.add(referral);
             }
+
 
         }
 
         return referrals;
+    }
+
+    private void processProblems(org.jsoup.nodes.Element row, int h, ReferenceParam patient, List<ReferralRequest> referrals) {
+
+        org.jsoup.select.Elements columns = row.select("td");
+            ReferralRequest referral = new ReferralRequest();
+        referral.setId("#"+h);
+        referral.setSubject(new Reference
+                ("Patient/"+patient.getIdPart()));
+
+
+        int g = 0;
+        for (org.jsoup.nodes.Element column : columns) {
+            if (g==0) {
+                try {
+                    Date date = format.parse ( column.text() );
+                    referral.setAuthoredOn(date);
+                }
+                catch (Exception ignore) {
+
+                }
+            }
+            if (g==1) {
+                ReferralRequest.ReferralRequestRequesterComponent ref = referral.getRequester();
+                ref.getAgent().setDisplay(column.text());
+            }
+            if (g==2) {
+                Reference ref = referral.addRecipient();
+                ref.setDisplay(column.text());
+            }
+            if (g==4) {
+
+                referral.setDescription(column.text());
+            }
+
+
+            g++;
+        }
+        if (referral.hasDescription())
+            referrals.add(referral);
+
     }
 
 }
