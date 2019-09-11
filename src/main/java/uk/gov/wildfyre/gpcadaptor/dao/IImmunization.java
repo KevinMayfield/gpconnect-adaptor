@@ -9,6 +9,6 @@ import java.util.List;
 public interface IImmunization {
 
 
-    List<Immunization> search(IGenericClient client, ReferenceParam patient) throws Exception;
+    List<Immunization> search(IGenericClient client, ReferenceParam patient);
 
 }

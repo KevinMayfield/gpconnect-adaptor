@@ -30,7 +30,7 @@ public class ImmunizationDao implements IImmunization {
     private static final Logger log = LoggerFactory.getLogger(ImmunizationDao.class);
 
     @Override
-    public List<Immunization> search(IGenericClient client, ReferenceParam patient) throws Exception {
+    public List<Immunization> search(IGenericClient client, ReferenceParam patient)  {
 
 
         List<Immunization> immunizations = new ArrayList<>();

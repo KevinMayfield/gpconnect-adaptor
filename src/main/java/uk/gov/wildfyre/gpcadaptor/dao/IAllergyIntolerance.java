@@ -9,6 +9,6 @@ import java.util.List;
 public interface IAllergyIntolerance {
 
 
-    List<AllergyIntolerance> search(IGenericClient client, ReferenceParam patient) throws Exception;
+    List<AllergyIntolerance> search(IGenericClient client, ReferenceParam patient) ;
 
 }

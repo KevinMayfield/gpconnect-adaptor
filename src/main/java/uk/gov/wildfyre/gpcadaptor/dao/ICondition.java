@@ -9,6 +9,6 @@ import java.util.List;
 public interface ICondition {
 
 
-    List<Condition> search(IGenericClient client, ReferenceParam patient) throws Exception;
+    List<Condition> search(IGenericClient client, ReferenceParam patient);
 
 }

@@ -9,6 +9,6 @@ import java.util.List;
 public interface IObservation {
 
 
-    List<Observation> search(IGenericClient client, ReferenceParam patient) throws Exception;
+    List<Observation> search(IGenericClient client, ReferenceParam patient) ;
 
 }

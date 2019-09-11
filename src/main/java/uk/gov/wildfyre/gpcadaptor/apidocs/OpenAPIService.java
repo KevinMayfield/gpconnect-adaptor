@@ -38,6 +38,8 @@ public class OpenAPIService {
     
     private static String fhirVersion = "/STU3/";
 
+    JSONObject paths = null;
+
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OpenAPIService.class);
 
     @GetMapping(path = "/apidocs")
@@ -90,7 +92,7 @@ public class OpenAPIService {
         info.put("basePath",serverPath +"/STU3");
         info.put("schemes", new JSONArray().put("http"));
 
-        JSONObject paths = new JSONObject();
+        paths = new JSONObject();
         obj.put("paths",paths);
 
         JSONObject resObjC = new JSONObject();
@@ -113,59 +115,22 @@ public class OpenAPIService {
             for (CapabilityStatement.CapabilityStatementRestResourceComponent resourceComponent : rest.getResource()) {
 
                 for (CapabilityStatement.ResourceInteractionComponent interactionComponent : resourceComponent.getInteraction()) {
-                    JSONObject resObj = null;
+
                     switch (interactionComponent.getCode()) {
                         case READ:
-                            if (pathMap.containsKey(serverPath + fhirVersion+resourceComponent.getType()+"/{id}")) {
-                                resObj = (JSONObject) pathMap.get(serverPath + fhirVersion+resourceComponent.getType()+"/{id}");
-                            } else {
-                                resObj = new JSONObject();
-                                pathMap.put(serverPath + fhirVersion+resourceComponent.getType()+"/{id}",resObj);
-                                paths.put(serverPath + fhirVersion+resourceComponent.getType()+"/{id}",resObj);
-                            }
-                            resObj.put("get",getId(resourceComponent, interactionComponent));
+                            processMethodId("get", pathMap, resourceComponent, interactionComponent);
                             break;
                         case SEARCHTYPE:
-                            if (pathMap.containsKey(serverPath + fhirVersion+resourceComponent.getType())) {
-                                resObj = (JSONObject) pathMap.get(serverPath + fhirVersion+resourceComponent.getType());
-                            } else {
-                                resObj = new JSONObject();
-                                pathMap.put(serverPath + fhirVersion+resourceComponent.getType(),resObj);
-                                paths.put(serverPath + fhirVersion+resourceComponent.getType(),resObj);
-                            }
-                            resObj.put("get",getSearch(resourceComponent, interactionComponent));
+                            processMethodType("get", pathMap, resourceComponent, interactionComponent);
                             break;
                         case DELETE:
-                            if (pathMap.containsKey(serverPath +fhirVersion+resourceComponent.getType()+"/{id}")) {
-                                resObj = (JSONObject) pathMap.get(serverPath +fhirVersion+resourceComponent.getType()+"/{id}");
-                            } else {
-                                resObj = new JSONObject();
-                                pathMap.put(serverPath +fhirVersion+resourceComponent.getType()+"/{id}",resObj);
-                                paths.put(serverPath +fhirVersion+resourceComponent.getType()+"/{id}",resObj);
-                            }
-                            resObj.put("delete",getId(resourceComponent, interactionComponent));
+                            processMethodId("delete", pathMap, resourceComponent, interactionComponent);
                             break;
                         case UPDATE:
-                            if (pathMap.containsKey(serverPath + fhirVersion+resourceComponent.getType()+"/{id}")) {
-                                resObj = (JSONObject) pathMap.get(serverPath + fhirVersion+resourceComponent.getType()+"/{id}");
-                            } else {
-                                resObj = new JSONObject();
-                                pathMap.put(serverPath + fhirVersion+resourceComponent.getType()+"/{id}",resObj);
-                                paths.put(serverPath + fhirVersion+resourceComponent.getType()+"/{id}",resObj);
-                            }
-                            resObj.put("put",getId(resourceComponent, interactionComponent));
+                            processMethodId("put", pathMap, resourceComponent, interactionComponent);
                             break;
                         case CREATE:
-
-                            if (pathMap.containsKey(serverPath + fhirVersion+resourceComponent.getType())) {
-                                resObj = (JSONObject) pathMap.get(serverPath + fhirVersion+resourceComponent.getType());
-                            } else {
-                                resObj = new JSONObject();
-                                pathMap.put(serverPath + fhirVersion+resourceComponent.getType(),resObj);
-                                paths.put(serverPath + fhirVersion+resourceComponent.getType(),resObj);
-                            }
-
-                            resObj.put("post",getSearch(resourceComponent, interactionComponent));
+                            processMethodType("post", pathMap, resourceComponent, interactionComponent);
                             break;
                         default:
                     }
@@ -177,7 +142,33 @@ public class OpenAPIService {
         return retStr;
     }
 
+    private void processMethodId(String method, Map pathMap,
+                                   CapabilityStatement.CapabilityStatementRestResourceComponent resourceComponent,
+                                   CapabilityStatement.ResourceInteractionComponent interactionComponent) {
+        JSONObject resObj = null;
+        if (pathMap.containsKey(serverPath + fhirVersion+resourceComponent.getType()+"/{id}")) {
+            resObj = (JSONObject) pathMap.get(serverPath + fhirVersion+resourceComponent.getType()+"/{id}");
+        } else {
+            resObj = new JSONObject();
+            pathMap.put(serverPath + fhirVersion+resourceComponent.getType()+"/{id}",resObj);
+            paths.put(serverPath + fhirVersion+resourceComponent.getType()+"/{id}",resObj);
+        }
+        resObj.put(method,getId(resourceComponent, interactionComponent));
+    }
+    private void processMethodType(String method, Map pathMap,
+                                     CapabilityStatement.CapabilityStatementRestResourceComponent resourceComponent,
+                                     CapabilityStatement.ResourceInteractionComponent interactionComponent) {
+        JSONObject resObj = null;
+        if (pathMap.containsKey(serverPath + fhirVersion+resourceComponent.getType())) {
+            resObj = (JSONObject) pathMap.get(serverPath + fhirVersion+resourceComponent.getType());
+        } else {
+            resObj = new JSONObject();
+            pathMap.put(serverPath + fhirVersion+resourceComponent.getType(),resObj);
+            paths.put(serverPath + fhirVersion+resourceComponent.getType(),resObj);
+        }
+        resObj.put(method,getSearch(resourceComponent, interactionComponent));
 
+    }
 
 
     private JSONObject getSearch(CapabilityStatement.CapabilityStatementRestResourceComponent resourceComponent,

@@ -18,7 +18,7 @@ public class MedicationRequestDao implements IMedicationRequest {
     private static final Logger log = LoggerFactory.getLogger(MedicationRequestDao.class);
 
     @Override
-    public List<Resource> search(IGenericClient client, ReferenceParam patient) throws Exception {
+    public List<Resource> search(IGenericClient client, ReferenceParam patient) {
 
         if (patient == null) {
             return Collections.emptyList();

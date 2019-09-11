@@ -9,6 +9,6 @@ import java.util.List;
 public interface IEncounter {
 
 
-    List<Encounter> search(IGenericClient client, ReferenceParam patient) throws Exception;
+    List<Encounter> search(IGenericClient client, ReferenceParam patient) ;
 
 }

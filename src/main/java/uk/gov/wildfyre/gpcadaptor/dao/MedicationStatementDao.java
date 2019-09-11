@@ -23,7 +23,7 @@ public class MedicationStatementDao implements IMedicationStatement {
     IMedicationRequest medicationRequestDAO;
 
     @Override
-    public List<Resource> search(IGenericClient client, ReferenceParam patient,  Set<Include> includes) throws Exception {
+    public List<Resource> search(IGenericClient client, ReferenceParam patient,  Set<Include> includes) {
 
         if (patient == null) {
             return Collections.emptyList();

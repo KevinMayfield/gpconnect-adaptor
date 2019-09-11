@@ -29,7 +29,7 @@ public class EncounterDao implements IEncounter {
     private static final Logger log = LoggerFactory.getLogger(EncounterDao.class);
 
     @Override
-    public List<Encounter> search(IGenericClient client, ReferenceParam patient) throws Exception {
+    public List<Encounter> search(IGenericClient client, ReferenceParam patient) {
 
 
         List<Encounter> encounters = new ArrayList<>();

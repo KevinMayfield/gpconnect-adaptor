@@ -9,6 +9,6 @@ import java.util.List;
 public interface IReferralRequest {
 
 
-    List<ReferralRequest> search(IGenericClient client, ReferenceParam patient) throws Exception ;
+    List<ReferralRequest> search(IGenericClient client, ReferenceParam patient) ;
 
 }

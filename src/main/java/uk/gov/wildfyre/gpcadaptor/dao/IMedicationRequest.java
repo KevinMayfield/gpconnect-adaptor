@@ -10,7 +10,7 @@ import java.util.List;
 public interface IMedicationRequest {
 
 
-    List<Resource> search(IGenericClient client, ReferenceParam patient) throws Exception;
+    List<Resource> search(IGenericClient client, ReferenceParam patient);
 
     List<Resource> extractMedicationRequest(Bundle result);
 

@@ -1,7 +1,5 @@
 package uk.gov.wildfyre.gpcadaptor.dao;
 
-
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Composition;
@@ -30,14 +28,12 @@ public class ReferralRequestDao implements IReferralRequest {
     private static final Logger log = LoggerFactory.getLogger(ReferralRequestDao.class);
 
     @Override
-    public List<ReferralRequest> search(IGenericClient client, ReferenceParam patient) throws Exception {
+    public List<ReferralRequest> search(IGenericClient client, ReferenceParam patient) {
 
         if (patient == null) {
             return Collections.emptyList();
         }
         String sectionCode="REF";
-        List<ReferralRequest> referrals = new ArrayList<>();
-
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode);
 
         Bundle result = null;
@@ -52,25 +48,30 @@ public class ReferralRequestDao implements IReferralRequest {
 
         }
 
-        if (result != null) {
-            for (Bundle.Entry entry : result.getEntry()) {
-                if (entry.getResource() instanceof Composition) {
+        return processBundle(result,patient,sectionCode);
+    }
 
-                    Composition doc = (Composition) entry.getResource();
+    private List<ReferralRequest> processBundle(Bundle result, ReferenceParam patient, String sectionCode) {
+        List<ReferralRequest> referrals = new ArrayList<>();
+            if (result != null) {
+                for (Bundle.Entry entry : result.getEntry()) {
+                    if (entry.getResource() instanceof Composition) {
 
-                    for (Composition.Section
-                            section : doc.getSection()) {
-                        if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
-                            log.info("Processing Section REF");
-                            referrals = extractReferralRequests(section, patient);
+                        Composition doc = (Composition) entry.getResource();
+
+                        for (Composition.Section
+                                section : doc.getSection()) {
+                            if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
+                                log.info("Processing Section REF");
+                                referrals = extractReferralRequests(section, patient);
+                            }
                         }
                     }
                 }
+
             }
-
-        }
-
         return referrals;
+
     }
 
     private List<ReferralRequest> extractReferralRequests(Composition.Section section,ReferenceParam patient) {

@@ -11,7 +11,7 @@ import java.util.Set;
 public interface IMedicationStatement {
 
 
-    List<Resource> search(IGenericClient client, ReferenceParam patient, Set<Include> includes) throws Exception;
+    List<Resource> search(IGenericClient client, ReferenceParam patient, Set<Include> includes);
 
     List<Resource> extractMedicationStatement(Bundle result);
 

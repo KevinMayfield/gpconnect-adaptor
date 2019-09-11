@@ -7,14 +7,9 @@ import ca.uhn.fhir.model.dstu2.resource.Parameters;
 import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.DateTimeType;
-import org.hl7.fhir.dstu3.model.Observation;
-import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.wildfyre.gpcadaptor.support.StructuredRecord;
 
@@ -26,17 +21,14 @@ import java.util.List;
 
 @Component
 public class ObservationDao implements IObservation {
-
-    private static final Logger log = LoggerFactory.getLogger(ObservationDao.class);
-
     @Override
-    public List<Observation> search(IGenericClient client, ReferenceParam patient) throws Exception {
+    public List<Observation> search(IGenericClient client, ReferenceParam patient)  {
 
         if (patient == null) {
             return Collections.emptyList();
         }
         String sectionCode="OBS";
-        List<Observation> observations = new ArrayList<>();
+
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode);
         Bundle result = null;
@@ -51,16 +43,18 @@ public class ObservationDao implements IObservation {
 
         }
 
+        return processBundle(result,patient,sectionCode);
+    }
+    private List<Observation> processBundle(Bundle result, ReferenceParam patient, String sectionCode) {
+        List<Observation> observations = new ArrayList<>();
         if (result != null) {
             for (Bundle.Entry entry : result.getEntry()) {
                 if (entry.getResource() instanceof Composition) {
-
                     Composition doc = (Composition) entry.getResource();
 
                     for (Composition.Section
                             section : doc.getSection()) {
                         if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
-                            log.info("Processing Section OBS");
                             observations = extractObservations(section, patient);
                         }
                     }
@@ -68,10 +62,9 @@ public class ObservationDao implements IObservation {
             }
 
         }
-
         return observations;
-    }
 
+    }
     private List<Observation> extractObservations(Composition.Section section,ReferenceParam patient) {
         List<Observation> observations = new ArrayList<>();
 

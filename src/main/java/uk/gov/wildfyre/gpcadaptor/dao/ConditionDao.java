@@ -27,17 +27,14 @@ import java.util.List;
 public class ConditionDao implements ICondition {
 
     @Override
-    public List<Condition> search(IGenericClient client, ReferenceParam patient) throws Exception {
-
+    public List<Condition> search(IGenericClient client, ReferenceParam patient)  {
 
         List<Condition> conditions = new ArrayList<>();
         String sectionCode="SUM";
         if (patient == null) {
             return Collections.emptyList();
         }
-
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode);
-
         Bundle result = null;
         try {
             result = client.operation().onType(Patient.class)

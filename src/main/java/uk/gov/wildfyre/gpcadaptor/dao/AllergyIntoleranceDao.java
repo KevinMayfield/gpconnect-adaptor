@@ -12,8 +12,6 @@ import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.wildfyre.gpcadaptor.support.StructuredRecord;
 
@@ -23,15 +21,13 @@ import java.util.*;
 @Component
 public class AllergyIntoleranceDao implements IAllergyIntolerance {
 
-    private static final Logger log = LoggerFactory.getLogger(AllergyIntoleranceDao.class);
-
     @Override
-    public List<AllergyIntolerance> search(IGenericClient client, ReferenceParam patient) throws Exception {
+    public List<AllergyIntolerance> search(IGenericClient client, ReferenceParam patient) {
 
         if (patient == null) {
             return Collections.emptyList();
         }
-        List<AllergyIntolerance> allergys = new ArrayList<>();
+
 
         Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),"ALL");
 
@@ -43,9 +39,14 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                     .returnResourceType(Bundle.class)
                     .encodedJson()
                     .execute();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {   }
 
+        return processBundle(result, patient);
+    }
+
+    private List<AllergyIntolerance> processBundle(Bundle result, ReferenceParam patient)
+    {
+        List<AllergyIntolerance> allergys = new ArrayList<>();
         if (result != null) {
             for (Bundle.Entry entry : result.getEntry()) {
                 if (entry.getResource() instanceof Composition) {
@@ -53,7 +54,6 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                     for (Composition.Section
                             section : doc.getSection()) {
                         if (section.getCode().getCodingFirstRep().getCode().equals("ALL")) {
-                            log.info("Processing Section ALL");
                             allergys = extractAllergyIntolerances(section, patient);
                         }
                     }
@@ -61,7 +61,6 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
             }
 
         }
-
         return allergys;
     }
 
