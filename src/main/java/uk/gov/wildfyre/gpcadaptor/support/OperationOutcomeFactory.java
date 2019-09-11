@@ -53,6 +53,42 @@ public class OperationOutcomeFactory {
         return issueType;
     }
 
+    private static void processCode(OperationOutcome outcome, OperationOutcome.OperationOutcomeIssueComponent issue, String text, String diagnostics) {
+        switch (issue.getCode()) {
+            case NOTFOUND:
+                throw new ResourceNotFoundException(text,outcome);
+            case PROCESSING:
+
+                if (diagnostics.contains("The FHIR endpoint on this server does not know how to handle")) {
+                    throw new NotImplementedOperationException(text,outcome);
+                } else {
+                    throw new UnprocessableEntityException(text, outcome);
+                }
+            case SECURITY:
+                throw new AuthenticationException();
+            case INVALID:
+                // 400
+                throw new InvalidRequestException(text,outcome);
+            case EXCEPTION:
+                throw new InternalErrorException(text,outcome);
+            case FORBIDDEN:
+                throw new ForbiddenOperationException(text,outcome);
+            case CONFLICT:
+                throw new ResourceVersionConflictException(text,outcome);
+            case NOTSUPPORTED:
+                // 501
+                throw new NotImplementedOperationException(text,outcome);
+            case DUPLICATE:
+                throw new PreconditionFailedException(text,outcome);
+            case BUSINESSRULE:
+                /// Check this is 405
+                throw new MethodNotAllowedException(text,outcome);
+
+            default:
+                throw new UnprocessableEntityException(text, outcome);
+
+        }
+    }
     public static void convertToException (OperationOutcome outcome ) {
         for (OperationOutcome.OperationOutcomeIssueComponent issue : outcome.getIssue()) {
 
@@ -66,40 +102,7 @@ public class OperationOutcomeFactory {
 
             if (text==null) text = "Unknown Reason";
 
-            switch (issue.getCode()) {
-                case NOTFOUND:
-                    throw new ResourceNotFoundException(text,outcome);
-                case PROCESSING:
-
-                    if (diagnostics.contains("The FHIR endpoint on this server does not know how to handle")) {
-                        throw new NotImplementedOperationException(text,outcome);
-                    } else {
-                        throw new UnprocessableEntityException(text, outcome);
-                    }
-                case SECURITY:
-                    throw new AuthenticationException();
-                case INVALID:
-                    // 400
-                    throw new InvalidRequestException(text,outcome);
-                case EXCEPTION:
-                    throw new InternalErrorException(text,outcome);
-                case FORBIDDEN:
-                    throw new ForbiddenOperationException(text,outcome);
-                case CONFLICT:
-                    throw new ResourceVersionConflictException(text,outcome);
-                case NOTSUPPORTED:
-                    // 501
-                    throw new NotImplementedOperationException(text,outcome);
-                case DUPLICATE:
-                    throw new PreconditionFailedException(text,outcome);
-                case BUSINESSRULE:
-                    /// Check this is 405
-                    throw new MethodNotAllowedException(text,outcome);
-
-                default:
-                    throw new UnprocessableEntityException(text, outcome);
-
-            }
+            processCode(outcome, issue, text, diagnostics);
         }
         // Catch all
         throw new UnprocessableEntityException("Unknown Error", outcome);

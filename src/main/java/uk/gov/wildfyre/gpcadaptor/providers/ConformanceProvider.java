@@ -31,6 +31,10 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConformanceProvider.class);
 
+    private String oauth2authorize ;
+    private String oauth2token ;
+    private String oauth2register ;
+    private String oauth2 ;
 
     public ConformanceProvider() {
         super();
@@ -52,10 +56,10 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
     	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(theRequest.getServletContext());
     	log.info("restful2 Server not null = {}", ctx.getEnvironment().getProperty("ccri.validate_flag"));
 
-        String oauth2authorize = ctx.getEnvironment().getProperty("ccri.oauth2.authorize");
-        String oauth2token = ctx.getEnvironment().getProperty("ccri.oauth2.token");
-        String oauth2register = ctx.getEnvironment().getProperty("ccri.oauth2.register");
-        String oauth2 = ctx.getEnvironment().getProperty("ccri.oauth2");
+        oauth2authorize = ctx.getEnvironment().getProperty("ccri.oauth2.authorize");
+        oauth2token = ctx.getEnvironment().getProperty("ccri.oauth2.token");
+        oauth2register = ctx.getEnvironment().getProperty("ccri.oauth2.register");
+        oauth2 = ctx.getEnvironment().getProperty("ccri.oauth2");
 
         if (this.capabilityStatement != null && myCache) {
             return this.capabilityStatement;
@@ -63,6 +67,21 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
 
         this.capabilityStatement = super.getServerConformance(theRequest, theRequestDetails);
 
+        coreStatement();
+
+        if (restfulServer != null) {
+            log.info("restful Server not null");
+
+            processRest();
+            log.trace("restful Server not null");
+
+            processRestResources();
+        }
+
+        return capabilityStatement;
+    }
+
+    private void coreStatement() {
         capabilityStatement.setDateElement(conformanceDate());
         capabilityStatement.setFhirVersion(FhirVersionEnum.DSTU3.getFhirVersionString());
         capabilityStatement.setAcceptUnknown(CapabilityStatement.UnknownContentCode.EXTENSIONS);
@@ -83,72 +102,74 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
         capabilityStatement.setPublisher("NHS Digital & DWP Digital");
 
         capabilityStatement.setStatus(Enumerations.PublicationStatus.ACTIVE);
+    }
+    private void processRest() {
+        for (CapabilityStatement.CapabilityStatementRestComponent nextRest : capabilityStatement.getRest()) {
+            nextRest.setMode(CapabilityStatement.RestfulCapabilityMode.SERVER);
 
-        if (restfulServer != null) {
-            log.info("restful Server not null");
-            for (CapabilityStatement.CapabilityStatementRestComponent nextRest : capabilityStatement.getRest()) {
-                nextRest.setMode(CapabilityStatement.RestfulCapabilityMode.SERVER);
+            // KGM only add if not already present
+            if (nextRest.hasSecurity() && nextRest.getSecurity().getService().isEmpty() && oauth2.equals("true")
+                    && oauth2token != null && oauth2register != null && oauth2authorize != null) {
+                nextRest.getSecurity()
+                        .addService().addCoding()
+                        .setSystem("http://hl7.org/fhir/restful-security-service")
+                        .setDisplay("SMART-on-FHIR")
+                        .setSystem("SMART-on-FHIR");
+                Extension securityExtension = nextRest.getSecurity().addExtension()
+                        .setUrl("http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris");
 
-                // KGM only add if not already present
-                if (nextRest.hasSecurity() && nextRest.getSecurity().getService().isEmpty() && oauth2.equals("true")
-                        && oauth2token != null && oauth2register != null && oauth2authorize != null) {
-                    nextRest.getSecurity()
-                            .addService().addCoding()
-                            .setSystem("http://hl7.org/fhir/restful-security-service")
-                            .setDisplay("SMART-on-FHIR")
-                            .setSystem("SMART-on-FHIR");
-                    Extension securityExtension = nextRest.getSecurity().addExtension()
-                            .setUrl("http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris");
+                securityExtension.addExtension()
+                        .setUrl("authorize")
+                        .setValue(new UriType(oauth2authorize));
 
-                    securityExtension.addExtension()
-                            .setUrl("authorize")
-                            .setValue(new UriType(oauth2authorize));
+                securityExtension.addExtension()
+                        .setUrl("register")
+                        .setValue(new UriType(oauth2register));
 
-                    securityExtension.addExtension()
-                            .setUrl("register")
-                            .setValue(new UriType(oauth2register));
+                securityExtension.addExtension()
+                        .setUrl("token")
+                        .setValue(new UriType(oauth2token));
+            }
 
-                    securityExtension.addExtension()
-                            .setUrl("token")
-                            .setValue(new UriType(oauth2token));
+        }
+    }
+
+    private void processRestResources() {
+        for (CapabilityStatement.CapabilityStatementRestComponent nextRest : capabilityStatement.getRest()) {
+            for (CapabilityStatement.CapabilityStatementRestResourceComponent restResourceComponent : nextRest.getResource()) {
+
+                if (restResourceComponent.getType().equals("OperationDefinition") || restResourceComponent.getType().equals("StructureDefinition")) {
+                    nextRest.getResource().remove(restResourceComponent);
+                    break;
                 }
 
-            }
-            log.trace("restful Server not null");
-            for (CapabilityStatement.CapabilityStatementRestComponent nextRest : capabilityStatement.getRest()) {
-                for (CapabilityStatement.CapabilityStatementRestResourceComponent restResourceComponent : nextRest.getResource()) {
+                // Start of CRUD operations
 
-                    if (restResourceComponent.getType().equals("OperationDefinition") || restResourceComponent.getType().equals("StructureDefinition")) {
-                        nextRest.getResource().remove(restResourceComponent);
-                        break;
-                    }
+                log.trace("restResourceComponent.getType - {}", restResourceComponent.getType());
+                for (IResourceProvider provider : restfulServer.getResourceProviders()) {
+                    procProvider(provider, restResourceComponent);
 
-                    // Start of CRUD operations
-
-                    log.trace("restResourceComponent.getType - {}", restResourceComponent.getType());
-                    for (IResourceProvider provider : restfulServer.getResourceProviders()) {
-
-                        log.trace("Provider Resource - {}", provider.getResourceType().getSimpleName());
-                        if ((restResourceComponent.getType().equals(provider.getResourceType().getSimpleName())
-                                || (restResourceComponent.getType().contains("List") && provider.getResourceType().getSimpleName().contains("List")))
-                                && (provider instanceof ICCResourceProvider)) {
-                            log.trace("ICCResourceProvider - {}", provider.getClass());
-                            ICCResourceProvider resourceProvider = (ICCResourceProvider) provider;
-
-                            Extension extension = restResourceComponent.getExtensionFirstRep();
-                            if (extension == null) {
-                                extension = restResourceComponent.addExtension();
-                            }
-                            extension.setUrl("http://hl7api.sourceforge.net/hapi-fhir/res/extdefs.html#resourceCount")
-                                    .setValue(new DecimalType(resourceProvider.count()));
-                        }
-
-                    }
                 }
             }
         }
+    }
 
-        return capabilityStatement;
+    private void procProvider (IResourceProvider provider, CapabilityStatement.CapabilityStatementRestResourceComponent restResourceComponent) {
+        log.trace("Provider Resource - {}", provider.getResourceType().getSimpleName());
+        if ((restResourceComponent.getType().equals(provider.getResourceType().getSimpleName())
+                || (restResourceComponent.getType().contains("List") && provider.getResourceType().getSimpleName().contains("List")))
+                && (provider instanceof ICCResourceProvider)) {
+            log.trace("ICCResourceProvider - {}", provider.getClass());
+            ICCResourceProvider resourceProvider = (ICCResourceProvider) provider;
+
+            Extension extension = restResourceComponent.getExtensionFirstRep();
+            if (extension == null) {
+                extension = restResourceComponent.addExtension();
+            }
+            extension.setUrl("http://hl7api.sourceforge.net/hapi-fhir/res/extdefs.html#resourceCount")
+                    .setValue(new DecimalType(resourceProvider.count()));
+        }
+
     }
 
     public DateTimeType conformanceDate() {
