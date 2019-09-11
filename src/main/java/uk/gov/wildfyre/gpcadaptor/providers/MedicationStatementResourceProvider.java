@@ -42,7 +42,7 @@ public class MedicationStatementResourceProvider implements IResourceProvider {
             "MedicationStatement:medication",
             "MedicationStatement:based-on"}) Set<Include> includes
 
-    ) throws Exception {
+    )  {
 
         return resourceDao.search(client, patient, includes);
 

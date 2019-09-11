@@ -38,7 +38,7 @@ public class ConditionResourceProvider implements IResourceProvider {
     @Search
     public List<Condition> search(HttpServletRequest httpRequest,
                                                                @OptionalParam(name = Condition.SP_PATIENT) ReferenceParam patient
-    ) throws Exception {
+    )  {
 
         return resourceDao.search(client,patient);
 

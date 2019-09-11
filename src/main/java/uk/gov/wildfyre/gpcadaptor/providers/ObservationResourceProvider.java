@@ -38,7 +38,7 @@ public class ObservationResourceProvider implements IResourceProvider {
     @Search
     public List<Observation> search(HttpServletRequest httpRequest,
                                                                @OptionalParam(name = Observation.SP_PATIENT) ReferenceParam patient
-    ) throws Exception {
+    )  {
 
         return resourceDao.search(client,patient);
 

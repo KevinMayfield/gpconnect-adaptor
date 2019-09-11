@@ -86,6 +86,10 @@ public class HapiProperties {
 
     private static String nhsNumber;
 
+
+    private HapiProperties() {
+
+    }
     /*
      * Force the configuration to be reloaded
      */

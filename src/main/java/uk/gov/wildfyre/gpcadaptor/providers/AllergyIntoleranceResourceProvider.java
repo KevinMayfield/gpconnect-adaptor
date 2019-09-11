@@ -38,7 +38,7 @@ public class AllergyIntoleranceResourceProvider implements IResourceProvider {
     @Search
     public List<AllergyIntolerance> search(HttpServletRequest httpRequest,
                                                                @OptionalParam(name = AllergyIntolerance.SP_PATIENT) ReferenceParam patient
-    ) throws Exception {
+    ) {
 
         return resourceDao.search(client,patient);
 

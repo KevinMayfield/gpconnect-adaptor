@@ -38,7 +38,7 @@ public class EncounterResourceProvider implements IResourceProvider {
     @Search
     public List<Encounter> search(HttpServletRequest httpRequest,
                                                                @OptionalParam(name = Encounter.SP_PATIENT) ReferenceParam patient
-    ) throws Exception {
+    )  {
 
         return resourceDao.search(client,patient);
 

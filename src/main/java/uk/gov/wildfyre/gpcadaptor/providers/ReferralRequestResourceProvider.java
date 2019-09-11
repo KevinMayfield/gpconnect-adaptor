@@ -38,7 +38,7 @@ public class ReferralRequestResourceProvider implements IResourceProvider {
     @Search
     public List<ReferralRequest> search(HttpServletRequest httpRequest,
                                                                @OptionalParam(name = ReferralRequest.SP_PATIENT) ReferenceParam patient
-    ) throws Exception {
+    )  {
 
         return resourceDao.search(client,patient);
 

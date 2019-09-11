@@ -21,6 +21,9 @@ import java.util.*;
 @Component
 public class AllergyIntoleranceDao implements IAllergyIntolerance {
 
+    SimpleDateFormat
+            format = new SimpleDateFormat("dd-MMM-yyyy");
+
     @Override
     public List<AllergyIntolerance> search(IGenericClient client, ReferenceParam patient) {
 
@@ -68,8 +71,7 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
         List<AllergyIntolerance> allergys = new ArrayList<>();
 
         NarrativeDt text = section.getText();
-        SimpleDateFormat
-                format = new SimpleDateFormat("dd-MMM-yyyy");
+
 
         Document doc = Jsoup.parse(text.getDivAsString());
         org.jsoup.select.Elements rows = doc.select("tr");
@@ -100,91 +102,99 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                 f++;
             }
             if (current) {
-                columns = row.select("td");
-                AllergyIntolerance allergy = new AllergyIntolerance();
-                allergy.setClinicalStatus(AllergyIntolerance.AllergyIntoleranceClinicalStatus.ACTIVE);
-
-                allergy.setId("#"+h);
-                allergy.setPatient(new Reference
-                        ("Patient/"+patient.getIdPart()));
-
-                h++;
-                int g = 0;
-                Period period = new Period();
-
-                for (org.jsoup.nodes.Element column : columns) {
-
-                    if (g==0) {
-                        try {
-                            Date date = format.parse ( column.text() );
-
-                            period.setStart(date);
-                        }
-                        catch (Exception ignored) {
-                        }
-                    }
-
-
-                    if (g==1) {
-
-                        allergy.setOnset(period);
-                        allergy.getCode()
-                                    .setText(column.text());
-                    }
-                    g++;
-                }
-                if (allergy.hasCode() )
-                    allergys.add(allergy);
+                processCurrent(row, h, patient, allergys);
             }
 
 
             if (past) {
-                columns = row.select("td");
-                AllergyIntolerance allergy = new AllergyIntolerance();
-                allergy.setClinicalStatus(AllergyIntolerance.AllergyIntoleranceClinicalStatus.INACTIVE);
-                allergy.setId("#"+h);
-                allergy.setPatient(new Reference
-                        ("Patient/"+patient.getIdPart()));
-
-                h++;
-                int g = 0;
-                Period period = new Period();
-
-                for (org.jsoup.nodes.Element column : columns) {
-
-                    if (g==0) {
-                        try {
-                            Date date = format.parse ( column.text() );
-
-                            period.setStart(date);
-                        }
-                        catch (Exception ignore) {}
-                    }
-                    if (g==1) {
-                        try {
-                            Date date = format.parse ( column.text() );
-
-                            period.setEnd(date);
-                        }
-                        catch (Exception ignored) {  }
-                    }
-
-                    if (g==2) {
-
-                        allergy.setOnset(period);
-                        allergy.getCode()
-                                .setText(column.text());
-                    }
-                    g++;
-                }
-                if (allergy.hasCode() )
-                    allergys.add(allergy);
+                processPast(row, h, patient, allergys);
             }
+            h++;
 
 
         }
 
         return allergys;
+    }
+
+    private void processCurrent(org.jsoup.nodes.Element row, int h, ReferenceParam patient, List<AllergyIntolerance> allergys) {
+        org.jsoup.select.Elements columns = row.select("td");
+        AllergyIntolerance allergy = new AllergyIntolerance();
+        allergy.setClinicalStatus(AllergyIntolerance.AllergyIntoleranceClinicalStatus.ACTIVE);
+
+        allergy.setId("#"+h);
+        allergy.setPatient(new Reference
+                ("Patient/"+patient.getIdPart()));
+
+
+        int g = 0;
+        Period period = new Period();
+
+        for (org.jsoup.nodes.Element column : columns) {
+
+            if (g==0) {
+                try {
+                    Date date = format.parse ( column.text() );
+
+                    period.setStart(date);
+                }
+                catch (Exception ignored) {
+                }
+            }
+
+
+            if (g==1) {
+
+                allergy.setOnset(period);
+                allergy.getCode()
+                        .setText(column.text());
+            }
+            g++;
+        }
+        if (allergy.hasCode() )
+            allergys.add(allergy);
+    }
+
+    private void processPast(org.jsoup.nodes.Element row, int h, ReferenceParam patient, List<AllergyIntolerance> allergys) {
+        org.jsoup.select.Elements columns = row.select("td");
+        AllergyIntolerance allergy = new AllergyIntolerance();
+        allergy.setClinicalStatus(AllergyIntolerance.AllergyIntoleranceClinicalStatus.INACTIVE);
+        allergy.setId("#"+h);
+        allergy.setPatient(new Reference
+                ("Patient/"+patient.getIdPart()));
+
+        int g = 0;
+        Period period = new Period();
+
+        for (org.jsoup.nodes.Element column : columns) {
+
+            if (g==0) {
+                try {
+                    Date date = format.parse ( column.text() );
+
+                    period.setStart(date);
+                }
+                catch (Exception ignore) {}
+            }
+            if (g==1) {
+                try {
+                    Date date = format.parse ( column.text() );
+
+                    period.setEnd(date);
+                }
+                catch (Exception ignored) {  }
+            }
+
+            if (g==2) {
+
+                allergy.setOnset(period);
+                allergy.getCode()
+                        .setText(column.text());
+            }
+            g++;
+        }
+        if (allergy.hasCode() )
+            allergys.add(allergy);
     }
 
 }

@@ -38,7 +38,7 @@ public class ImmunizationResourceProvider implements IResourceProvider {
     @Search
     public List<Immunization> search(HttpServletRequest httpRequest,
                                                                @OptionalParam(name = Immunization.SP_PATIENT) ReferenceParam patient
-    ) throws Exception {
+    )  {
 
         return resourceDao.search(client,patient);
 
