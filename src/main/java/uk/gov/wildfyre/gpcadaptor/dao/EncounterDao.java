@@ -28,11 +28,12 @@ public class EncounterDao implements IEncounter {
 
     private static final Logger log = LoggerFactory.getLogger(EncounterDao.class);
 
+    SimpleDateFormat
+            format = new SimpleDateFormat("dd-MMM-yyyy");
+
     @Override
     public List<Encounter> search(IGenericClient client, ReferenceParam patient) {
 
-
-        List<Encounter> encounters = new ArrayList<>();
         String sectionCode="ENC";
         if (patient == null) {
             return Collections.emptyList();
@@ -52,33 +53,35 @@ public class EncounterDao implements IEncounter {
 
         }
 
-        if (result != null) {
-            for (Bundle.Entry entry : result.getEntry()) {
-                if (entry.getResource() instanceof Composition) {
+        return processBundle(result,patient, sectionCode);
+    }
+        private List<Encounter> processBundle(Bundle result, ReferenceParam patient, String sectionCode) {
+            List<Encounter> encounters = new ArrayList<>();
+            if (result != null) {
+                for (Bundle.Entry entry : result.getEntry()) {
+                    if (entry.getResource() instanceof Composition) {
 
-                    Composition doc = (Composition) entry.getResource();
+                        Composition doc = (Composition) entry.getResource();
 
-                    for (Composition.Section
-                            section : doc.getSection()) {
-                        if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
-                            log.info("Processing Section ENC");
-                            encounters = extractEncounters(section, patient);
+                        for (Composition.Section
+                                section : doc.getSection()) {
+                            if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
+                                log.info("Processing Section ENC");
+                                encounters = extractEncounters(section, patient);
+                            }
                         }
                     }
                 }
+
             }
-
+            return encounters;
         }
-
-        return encounters;
-    }
 
     private List<Encounter> extractEncounters(Composition.Section section,ReferenceParam patient) {
         List<Encounter> encounters = new ArrayList<>();
 
         NarrativeDt text = section.getText();
-        SimpleDateFormat
-                format = new SimpleDateFormat("dd-MMM-yyyy");
+
 
         Document doc = Jsoup.parse(text.getDivAsString());
         org.jsoup.select.Elements rows = doc.select("tr");
@@ -97,50 +100,58 @@ public class EncounterDao implements IEncounter {
                     problems = false;
                 }
 
-
-            }
-            if (problems) {
-                columns = row.select("td");
-                Encounter encounter = new Encounter();
-                encounter.setId("#"+h);
-                encounter.setSubject(new Reference
-                        ("Patient/"+patient.getIdPart()));
-
+                processProblems(problems, row, patient, h, encounters);
                 h++;
-                int g = 0;
-                for (org.jsoup.nodes.Element column : columns) {
-
-                    if (g==0) {
-                        try {
-                            Date date = format.parse ( column.text() );
-                            encounter.getPeriod().setStart(date);
-                        }
-                        catch (Exception ignore) {
-
-                        }
-                    }
-                    if (g==1) {
-                        CodeableConcept code = new CodeableConcept();
-                        code.setText(column.text());
-                        encounter.addType(code);
-                    }
-
-                    if (g==2) {
-
-                        encounter.addReason()
-                                    .setText(column.text());
-                    }
-                    g++;
-                }
-                if (encounter.hasType() || encounter.hasReason())
-                    encounters.add(encounter);
             }
+
 
         }
 
         return encounters;
     }
 
+    private void processProblems(boolean problems,org.jsoup.nodes.Element row,ReferenceParam patient, int h, List<Encounter> encounters) {
+        if (problems) {
+            org.jsoup.select.Elements columns = row.select("td");
+            Encounter encounter = new Encounter();
+            encounter.setId("#"+h);
+            encounter.setSubject(new Reference
+                    ("Patient/"+patient.getIdPart()));
+
+            processColumns(columns, encounter);
+
+            if (encounter.hasType() || encounter.hasReason())
+                encounters.add(encounter);
+        }
+    }
+
+    private void processColumns(org.jsoup.select.Elements columns, Encounter encounter) {
+        int g = 0;
+        for (org.jsoup.nodes.Element column : columns) {
+
+            if (g==0) {
+                try {
+                    Date date = format.parse ( column.text() );
+                    encounter.getPeriod().setStart(date);
+                }
+                catch (Exception ignore) {
+
+                }
+            }
+            if (g==1) {
+                CodeableConcept code = new CodeableConcept();
+                code.setText(column.text());
+                encounter.addType(code);
+            }
+
+            if (g==2) {
+
+                encounter.addReason()
+                        .setText(column.text());
+            }
+            g++;
+        }
+    }
 }
 
 

@@ -37,7 +37,7 @@ public class GPCAdaptor {
     }
 
     @Bean
-    public ServletRegistrationBean ServletRegistrationBean() {
+    public ServletRegistrationBean servletRegistrationBean() {
         ServletRegistrationBean registration = new ServletRegistrationBean(new CustomRestfulServer(context), "/STU3/*");
         registration.setName("FhirServlet");
         registration.setLoadOnStartup(1);
@@ -54,12 +54,12 @@ public class GPCAdaptor {
 
     @Bean
     @Primary
-    public FhirContext FhirContextBean() {
+    public FhirContext fhirContextBean() {
         return FhirContext.forDstu3();
     }
 
     @Bean("CTXDSTU2")
-    public FhirContext FhirContextBeanDSTU2() {
+    public FhirContext fhirContextBeanDSTU2() {
         return FhirContext.forDstu2();
     }
 
