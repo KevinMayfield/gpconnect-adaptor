@@ -50,7 +50,7 @@ public class EncounterDao implements IEncounter {
                     .encodedJson()
                     .execute();
         } catch (Exception ignore) {
-
+            // No action
         }
 
         return processBundle(result,patient, sectionCode);
@@ -135,7 +135,7 @@ public class EncounterDao implements IEncounter {
                     encounter.getPeriod().setStart(date);
                 }
                 catch (Exception ignore) {
-
+                    // No action
                 }
             }
             if (g==1) {

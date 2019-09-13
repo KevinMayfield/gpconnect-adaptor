@@ -47,6 +47,7 @@ public class ConditionDao implements ICondition {
                     .encodedJson()
                     .execute();
         } catch (Exception ignored) {
+            // No action
         }
         return processBundle(result, patient, sectionCode);
     }
@@ -131,6 +132,7 @@ public class ConditionDao implements ICondition {
                     condition.setAssertedDate(date);
                 }
                 catch (Exception ignored) {
+                    // No action
                 }
             }
             if (g==1) {

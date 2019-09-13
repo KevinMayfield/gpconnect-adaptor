@@ -147,7 +147,7 @@ public class ImmunizationDao implements IImmunization {
                 immunization.setDate(date);
             }
             catch (Exception ignore) {
-
+                // No action
             }
         }
         if (g==1) {
@@ -160,7 +160,7 @@ public class ImmunizationDao implements IImmunization {
                     vaccination.setDoseSequence(seq);
                 }
             } catch (Exception ignore) {
-
+                // No action
             }
 
         }

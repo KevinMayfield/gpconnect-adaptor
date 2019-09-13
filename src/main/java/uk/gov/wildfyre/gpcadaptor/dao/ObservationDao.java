@@ -44,7 +44,7 @@ public class ObservationDao implements IObservation {
                     .encodedJson()
                     .execute();
         } catch (Exception ignore) {
-
+            // No action
         }
 
         return processBundle(result,patient,sectionCode);
@@ -127,7 +127,7 @@ public class ObservationDao implements IObservation {
                 observation.setEffective(new DateTimeType(date));
             }
             catch (Exception ignore) {
-
+                // No action
             }
         }
         if (g==1) {

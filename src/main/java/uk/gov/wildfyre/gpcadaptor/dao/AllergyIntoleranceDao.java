@@ -42,7 +42,9 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                     .returnResourceType(Bundle.class)
                     .encodedJson()
                     .execute();
-        } catch (Exception ignored) {   }
+        } catch (Exception ignored) {
+            // No action
+        }
 
         return processBundle(result, patient);
     }
@@ -139,6 +141,7 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                     period.setStart(date);
                 }
                 catch (Exception ignored) {
+                    // No action
                 }
             }
 
@@ -174,7 +177,9 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
 
                     period.setStart(date);
                 }
-                catch (Exception ignore) {}
+                catch (Exception ignore) {
+                    // No action
+                }
             }
             if (g==1) {
                 try {
@@ -182,7 +187,9 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
 
                     period.setEnd(date);
                 }
-                catch (Exception ignored) {  }
+                catch (Exception ignored) {
+                    // No action
+                }
             }
 
             if (g==2) {

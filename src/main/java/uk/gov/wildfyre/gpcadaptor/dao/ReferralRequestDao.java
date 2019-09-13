@@ -49,7 +49,7 @@ public class ReferralRequestDao implements IReferralRequest {
                     .encodedJson()
                     .execute();
         } catch (Exception ignore) {
-
+            // No action
         }
 
         return processBundle(result,patient,sectionCode);
@@ -128,7 +128,7 @@ public class ReferralRequestDao implements IReferralRequest {
                     referral.setAuthoredOn(date);
                 }
                 catch (Exception ignore) {
-
+                    // No action
                 }
             }
             if (g==1) {
