@@ -54,7 +54,7 @@ public class ImmunizationDao implements IImmunization {
                     .encodedJson()
                     .execute();
         } catch (Exception ignore) {
-
+                // No action
         }
 
         return processResult(result,sectionCode,patient);
