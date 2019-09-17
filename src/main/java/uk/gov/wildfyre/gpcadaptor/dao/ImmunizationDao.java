@@ -4,8 +4,6 @@ package uk.gov.wildfyre.gpcadaptor.dao;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Composition;
-import ca.uhn.fhir.model.dstu2.resource.Parameters;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
@@ -36,31 +34,18 @@ public class ImmunizationDao implements IImmunization {
     @Override
     public List<Immunization> search(IGenericClient client, ReferenceParam patient)  {
 
-
-
-        String sectionCode="IMM";
         if (patient == null) {
             return Collections.emptyList();
         }
 
-        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode);
+        String sectionCode="IMM";
 
-        Bundle result = null;
-        try {
-            result = client.operation().onType(Patient.class)
-                    .named("$gpc.getcarerecord")
-                    .withParameters(parameters)
-                    .returnResourceType(Bundle.class)
-                    .encodedJson()
-                    .execute();
-        } catch (Exception ignore) {
-                // No action
-        }
-
-        return processResult(result,sectionCode,patient);
+        return processBundle(
+                StructuredRecord.getRecord(client,
+                        StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode)),patient,sectionCode);
     }
 
-    private List<Immunization> processResult(Bundle result, String sectionCode, ReferenceParam patient) {
+    private List<Immunization> processBundle(Bundle result, ReferenceParam patient,String sectionCode) {
         List<Immunization> immunizations = new ArrayList<>();
         if (result != null) {
             for (Bundle.Entry entry : result.getEntry()) {

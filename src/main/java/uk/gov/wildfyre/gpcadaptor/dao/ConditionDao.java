@@ -4,8 +4,6 @@ import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 
 import ca.uhn.fhir.model.dstu2.resource.Composition;
-import ca.uhn.fhir.model.dstu2.resource.Parameters;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
@@ -37,19 +35,12 @@ public class ConditionDao implements ICondition {
             return Collections.emptyList();
         }
         String sectionCode="SUM";
-        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode);
-        Bundle result = null;
-        try {
-            result = client.operation().onType(Patient.class)
-                    .named("$gpc.getcarerecord")
-                    .withParameters(parameters)
-                    .returnResourceType(Bundle.class)
-                    .encodedJson()
-                    .execute();
-        } catch (Exception ignored) {
-            // No action
-        }
-        return processBundle(result, patient, sectionCode);
+
+
+        return processBundle(
+                StructuredRecord.getRecord(client,
+                        StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode)),patient,sectionCode);
+
     }
 
     private List<Condition> processBundle(Bundle result, ReferenceParam patient, String sectionCode) {

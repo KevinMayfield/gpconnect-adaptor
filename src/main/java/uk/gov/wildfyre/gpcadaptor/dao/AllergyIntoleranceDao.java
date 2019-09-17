@@ -3,8 +3,6 @@ package uk.gov.wildfyre.gpcadaptor.dao;
 import ca.uhn.fhir.model.dstu2.composite.NarrativeDt;
 import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Composition;
-import ca.uhn.fhir.model.dstu2.resource.Parameters;
-import ca.uhn.fhir.model.dstu2.resource.Patient;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.dstu3.model.AllergyIntolerance;
@@ -31,25 +29,15 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
             return Collections.emptyList();
         }
 
+        String sectionCode="ALL";
 
-        Parameters parameters  = StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),"ALL");
+        return processBundle(
+                StructuredRecord.getRecord(client,
+                        StructuredRecord.getUnStructuredRecordParameters(patient.getValue(),sectionCode)),patient,sectionCode);
 
-        Bundle result = null;
-        try {
-            result = client.operation().onType(Patient.class)
-                    .named("$gpc.getcarerecord")
-                    .withParameters(parameters)
-                    .returnResourceType(Bundle.class)
-                    .encodedJson()
-                    .execute();
-        } catch (Exception ignored) {
-            // No action
-        }
-
-        return processBundle(result, patient);
     }
 
-    private List<AllergyIntolerance> processBundle(Bundle result, ReferenceParam patient)
+    private List<AllergyIntolerance> processBundle(Bundle result, ReferenceParam patient, String sectionCode)
     {
         List<AllergyIntolerance> allergys = null;
         if (result != null) {
@@ -58,7 +46,7 @@ public class AllergyIntoleranceDao implements IAllergyIntolerance {
                     Composition doc = (Composition) entry.getResource();
                     for (Composition.Section
                             section : doc.getSection()) {
-                        if (section.getCode().getCodingFirstRep().getCode().equals("ALL")) {
+                        if (section.getCode().getCodingFirstRep().getCode().equals(sectionCode)) {
                             allergys = extractAllergyIntolerances(section, patient);
                         }
                     }

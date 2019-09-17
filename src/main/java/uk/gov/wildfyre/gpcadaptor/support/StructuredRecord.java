@@ -2,6 +2,9 @@ package uk.gov.wildfyre.gpcadaptor.support;
 
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Patient;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.dstu3.model.BooleanType;
 import org.hl7.fhir.dstu3.model.DateType;
 import org.hl7.fhir.dstu3.model.Identifier;
@@ -16,6 +19,22 @@ public abstract class StructuredRecord {
 
     private StructuredRecord() {
 
+    }
+
+    public static Bundle getRecord(IGenericClient client, ca.uhn.fhir.model.dstu2.resource.Parameters parameters) {
+
+        Bundle result = null;
+        try {
+            result = client.operation().onType(Patient.class)
+                    .named("$gpc.getcarerecord")
+                    .withParameters(parameters)
+                    .returnResourceType(Bundle.class)
+                    .encodedJson()
+                    .execute();
+        } catch (Exception ignore) {
+            // No action
+        }
+        return result;
     }
 
     public static Parameters getStructuredRecordParameters(String nhsNumber,boolean resolevAllergies, boolean prescriptionIssues, DateType fromDate) {
