@@ -2,6 +2,7 @@ package uk.gov.wildfyre.gpcadaptor.dao;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import org.hl7.fhir.dstu3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +20,18 @@ public class MedicationRequestDao implements IMedicationRequest {
 
 
     @Override
-    public List<Resource> search(IGenericClient client, ReferenceParam patient) {
+    public List<Resource> search(IGenericClient client, ReferenceParam patient, TokenParam status) {
 
         if (patient == null) {
             return Collections.emptyList();
         }
 
 
-        log.trace(patient.getIdPart() );
+        log.info(patient.getIdPart() );
+        log.info(patient.getValue() );
+        log.info(patient.getChain() );
 
-        Parameters parameters = StructuredRecord.getStructuredRecordParameters(patient.getValue(),false, false, new DateType(1980, 5, 5));
+        Parameters parameters = StructuredRecord.getStructuredRecordParameters(patient.getValue(),false, true, new DateType(1980, 5, 5));
         Bundle result = client.operation().onType(Patient.class)
                 .named("$gpc.getstructuredrecord")
                 .withParameters(parameters)
@@ -43,6 +46,7 @@ public class MedicationRequestDao implements IMedicationRequest {
         for(Bundle.BundleEntryComponent entry : result.getEntry()) {
             if (entry.getResource() instanceof MedicationRequest) {
                 MedicationRequest prescription = (MedicationRequest) entry.getResource();
+
 
                 processMedicationReference(prescription, result);
 
