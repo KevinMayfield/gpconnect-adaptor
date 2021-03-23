@@ -17,6 +17,7 @@ public class MedicationRequestDao implements IMedicationRequest {
 
     private static final Logger log = LoggerFactory.getLogger(MedicationRequestDao.class);
 
+
     @Override
     public List<Resource> search(IGenericClient client, ReferenceParam patient) {
 
@@ -45,11 +46,42 @@ public class MedicationRequestDao implements IMedicationRequest {
 
                 processMedicationReference(prescription, result);
 
+                if (prescription.hasMedicationReference()) {
+                    Medication medication = getMedication(result, prescription.getMedicationReference());
+                    if (medication != null && medication.hasCode()) {
+                        prescription.setMedication(
+                                medication.getCode()
+                        );
+                    }
+                }
+
+                if (prescription.hasSubject()) {
+                    Patient patient = getPatient(result, prescription.getSubject());
+                    if (patient != null && patient.hasIdentifier() && patient.getIdentifierFirstRep().getSystem().equals("https://fhir.nhs.uk/Id/nhs-number")) {
+                        prescription.getSubject().setIdentifier(patient.getIdentifierFirstRep());
+                        prescription.getSubject().setReference(null);
+                    }
+                }
+                if (prescription.hasRecorder()) {
+                    Practitioner practitioner = getPractitioner(result, prescription.getRecorder());
+                    if (practitioner != null && practitioner.hasIdentifier()) {
+                        prescription.getRecorder().setIdentifier(practitioner.getIdentifierFirstRep());
+                        prescription.getRecorder().setReference(null);
+                    }
+                }
+
+                if (prescription.hasDispenseRequest() && prescription.getDispenseRequest().hasPerformer()) {
+                    Organization organization = getOrganization(result, prescription.getDispenseRequest().getPerformer());
+                    if (organization != null && organization.hasIdentifier()) {
+                        prescription.getDispenseRequest().getPerformer().setIdentifier(organization.getIdentifierFirstRep());
+                        prescription.getDispenseRequest().getPerformer().setReference(null);
+                    }
+                }
                 if (prescription.hasRecorder() && prescription.getRecorder().getDisplay() == null) {
                     // Attempt to make the MedicationRequest more useful to calling systems.
                     Practitioner practitioner = getPractitioner(prescription.getRecorder(),result);
                     if (practitioner != null && practitioner.hasName()) {
-                               prescription.getRecorder().setDisplay(practitioner.getNameFirstRep().getNameAsSingleString());
+                         prescription.getRecorder().setDisplay(practitioner.getNameFirstRep().getNameAsSingleString());
                     }
 
                 }
@@ -57,6 +89,61 @@ public class MedicationRequestDao implements IMedicationRequest {
             }
         }
         return medications;
+    }
+
+    private Medication getMedication(Bundle result, Reference reference) {
+        for (Bundle.BundleEntryComponent entry : result.getEntry()) {
+
+            if (entry.getResource() instanceof Medication) {
+                Medication medication = (Medication) entry.getResource();
+                log.info("med id - " + medication.getId());
+                if (reference.hasReference() && medication.getId().contains(reference.getReference()) ) {
+                   return medication;
+
+                }
+            }
+
+        }
+        return null;
+    }
+
+    private Patient getPatient(Bundle result, Reference reference) {
+        for (Bundle.BundleEntryComponent entry : result.getEntry()) {
+
+            if (entry.getResource() instanceof Patient) {
+                Patient patient = (Patient) entry.getResource();
+                if (reference.hasReference() && patient.getId().contains(reference.getReference()) ) {
+                    return patient;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Practitioner getPractitioner(Bundle result, Reference reference) {
+        for (Bundle.BundleEntryComponent entry : result.getEntry()) {
+
+            if (entry.getResource() instanceof Practitioner) {
+                Practitioner practitioner = (Practitioner) entry.getResource();
+                if (reference.hasReference() && practitioner.getId().contains(reference.getReference()) ) {
+                    return practitioner;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Organization getOrganization(Bundle result, Reference reference) {
+        for (Bundle.BundleEntryComponent entry : result.getEntry()) {
+
+            if (entry.getResource() instanceof Organization) {
+                Organization organization = (Organization) entry.getResource();
+                if (reference.hasReference() && organization.getId().contains(reference.getReference()) ) {
+                    return organization;
+                }
+            }
+        }
+        return null;
     }
 
     private void processMedicationReference(MedicationRequest prescription, Bundle result) {
@@ -70,6 +157,7 @@ public class MedicationRequestDao implements IMedicationRequest {
                 }
                 else {
                     prescription.getMedicationReference().setDisplay(medication.getCode().getText());
+
                 }
 
             }

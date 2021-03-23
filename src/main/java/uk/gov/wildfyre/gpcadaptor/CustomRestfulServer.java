@@ -48,7 +48,7 @@ public class CustomRestfulServer extends ca.uhn.fhir.rest.server.RestfulServer {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
 
-        FhirVersionEnum fhirVersion = FhirVersionEnum.DSTU3;
+        FhirVersionEnum fhirVersion = FhirVersionEnum.R4;
         setFhirContext(new FhirContext(fhirVersion));
 
         setDefaultResponseEncoding(HapiProperties.getDefaultEncoding());
@@ -59,17 +59,10 @@ public class CustomRestfulServer extends ca.uhn.fhir.rest.server.RestfulServer {
         }
         List<IResourceProvider> resourceProviders = new ArrayList<>();
         resourceProviders.add(appCtx.getBean(MedicationStatementResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(PatientResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(PractitionerResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(LocationResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(OrganizationResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(ConditionResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(EncounterResourceProvider.class));
-
-        resourceProviders.add(appCtx.getBean(AllergyIntoleranceResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(ImmunizationResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(ObservationResourceProvider.class));
-        resourceProviders.add(appCtx.getBean(ReferralRequestResourceProvider.class));
+      //  resourceProviders.add(appCtx.getBean(PatientResourceProvider.class));
+      //  resourceProviders.add(appCtx.getBean(PractitionerResourceProvider.class));
+      //  resourceProviders.add(appCtx.getBean(LocationResourceProvider.class));
+      //  resourceProviders.add(appCtx.getBean(OrganizationResourceProvider.class));
         resourceProviders.add(appCtx.getBean(MedicationRequestResourceProvider.class));
 
         setFhirContext(appCtx.getBean(FhirContext.class));

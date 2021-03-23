@@ -7,8 +7,8 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.RestfulServerConfiguration;
-import org.hl7.fhir.dstu3.hapi.rest.server.ServerCapabilityStatementProvider;
-import org.hl7.fhir.dstu3.model.*;
+import org.hl7.fhir.r4.hapi.rest.server.ServerCapabilityStatementProvider;
+import org.hl7.fhir.r4.model.*;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -83,8 +83,6 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
 
     private void coreStatement() {
         capabilityStatement.setDateElement(conformanceDate());
-        capabilityStatement.setFhirVersion(FhirVersionEnum.DSTU3.getFhirVersionString());
-        capabilityStatement.setAcceptUnknown(CapabilityStatement.UnknownContentCode.EXTENSIONS);
         // effort since the parser
         // needs to be modified to actually allow it
 
@@ -95,10 +93,6 @@ public class ConformanceProvider extends ServerCapabilityStatementProvider {
         capabilityStatement.getImplementation().setDescription(HapiProperties.getSoftwareImplementationDesc());
         capabilityStatement.getImplementation().setUrl(HapiProperties.getSoftwareImplementationUrl());
 
-        // KGM only add if not already present
-        if (capabilityStatement.getImplementationGuide().isEmpty()) {
-            capabilityStatement.getImplementationGuide().add(new UriType(HapiProperties.getSoftwareImplementationGuide()));
-        }
         capabilityStatement.setPublisher("NHS Digital & DWP Digital");
 
         capabilityStatement.setStatus(Enumerations.PublicationStatus.ACTIVE);

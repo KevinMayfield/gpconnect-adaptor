@@ -6,8 +6,8 @@ import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import org.hl7.fhir.dstu3.model.MedicationStatement;
-import org.hl7.fhir.dstu3.model.Resource;
+import org.hl7.fhir.r4.model.MedicationStatement;
+import org.hl7.fhir.r4.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.wildfyre.gpcadaptor.dao.IMedicationStatement;
@@ -44,8 +44,8 @@ public class MedicationStatementResourceProvider implements IResourceProvider {
 
     )  {
 
-        return resourceDao.search(client, patient, includes);
-
+        resourceDao.search(client, patient, includes);
+        return null;
     }
 
 }

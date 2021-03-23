@@ -6,9 +6,9 @@ import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import org.hl7.fhir.dstu3.model.IdType;
-import org.hl7.fhir.dstu3.model.OperationOutcome;
-import org.hl7.fhir.dstu3.model.Organization;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.OperationOutcome;
+import org.hl7.fhir.r4.model.Organization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.wildfyre.gpcadaptor.dao.IOrganisation;
@@ -38,7 +38,7 @@ public class OrganizationResourceProvider implements IResourceProvider {
     @Read
     public Organization read(@IdParam IdType internalId) {
 
-
+/*
         Organization organisation = organisationDao.read(client,internalId);
         if (organisation == null) {
             throw OperationOutcomeFactory.buildOperationOutcomeException(
@@ -47,6 +47,9 @@ public class OrganizationResourceProvider implements IResourceProvider {
         }
 
         return organisation;
+
+ */
+        return null;
     }
 
 

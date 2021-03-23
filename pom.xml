@@ -6,7 +6,7 @@
 
     <groupId>uk.gov.wildfyre</groupId>
     <artifactId>gpc-adaptor</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>5.3.0-SNAPSHOT</version>
     <name>gpconnect-adaptor</name>
 
 
@@ -14,12 +14,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot-version>2.1.1.RELEASE</spring-boot-version>
-        <hapi-fhir-version>4.0.3</hapi-fhir-version>
+        <spring-boot-version>2.2.7.RELEASE</spring-boot-version>
+        <hapi-fhir-version>5.3.0</hapi-fhir-version>
         <hapi-hl7v2-version>2.3</hapi-hl7v2-version>
-        <care-connect-version>3.5.4</care-connect-version>
-        <camel-version>2.23.1</camel-version>
-        <hawtio.version>2.5.0</hawtio.version>
+        <camel-version>3.7.0</camel-version>
+
     </properties>
 
     <parent>
@@ -218,18 +217,7 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.1</version>
         </dependency>
-<!-- hawtio -->
-        <dependency>
-            <groupId>io.hawt</groupId>
-            <artifactId>hawtio-springboot</artifactId>
-            <version>${hawtio.version}</version>
-        </dependency>
 
-        <dependency>
-            <groupId>io.hawt</groupId>
-            <artifactId>hawtio-core</artifactId>
-            <version>${hawtio.version}</version>
-        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
         <dependency>
@@ -238,16 +226,11 @@
             <version>1.12.1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.json/json-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20171018</version>
         </dependency>
 
     </dependencies>

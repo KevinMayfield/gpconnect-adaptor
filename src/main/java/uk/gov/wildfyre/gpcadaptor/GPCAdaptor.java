@@ -16,12 +16,11 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 import uk.gov.wildfyre.gpcadaptor.support.CorsFilter;
 import uk.gov.wildfyre.gpcadaptor.interceptor.SSPInterceptor;
 
 @SpringBootApplication
-@EnableSwagger2
 public class GPCAdaptor {
 
     @Autowired
@@ -38,7 +37,7 @@ public class GPCAdaptor {
 
     @Bean
     public ServletRegistrationBean servletRegistrationBean() {
-        ServletRegistrationBean registration = new ServletRegistrationBean(new CustomRestfulServer(context), "/STU3/*");
+        ServletRegistrationBean registration = new ServletRegistrationBean(new CustomRestfulServer(context), "/R4/*");
         registration.setName("FhirServlet");
         registration.setLoadOnStartup(1);
         return registration;
@@ -55,18 +54,18 @@ public class GPCAdaptor {
     @Bean
     @Primary
     public FhirContext fhirContextBean() {
-        return FhirContext.forDstu3();
+        return FhirContext.forR4();
     }
 
-    @Bean("CTXDSTU2")
+    @Bean("r3ctx")
     public FhirContext fhirContextBeanDSTU2() {
-        return FhirContext.forDstu2();
+        return FhirContext.forDstu3();
     }
 
 
     @Bean
     @Primary
-    public IGenericClient getGPCConnection(FhirContext ctx) {
+    public IGenericClient getGPCConnection(@Qualifier("r3ctx") FhirContext ctx) {
         SSPInterceptor sspInterceptor = new SSPInterceptor();
 
         IGenericClient client = ctx.newRestfulGenericClient(HapiProperties.getGpConnectServer());
@@ -75,17 +74,6 @@ public class GPCAdaptor {
         return client;
     }
 
-    @Bean("CLIENTDSTU2")
-    public IGenericClient getGPCConnectionDSTU2(@Qualifier("CTXDSTU2") FhirContext ctx) {
-
-        ctx.getRestfulClientFactory().setServerValidationMode(ServerValidationModeEnum.NEVER);
-        SSPInterceptor sspInterceptor = new SSPInterceptor();
-
-        IGenericClient client = ctx.newRestfulGenericClient(HapiProperties.getGpConnectServerV0());
-
-        client.registerInterceptor(sspInterceptor);
-        return client;
-    }
 
     @Bean
     public FilterRegistrationBean corsFilter() {
@@ -101,6 +89,5 @@ public class GPCAdaptor {
         bean.setOrder(0);
         return bean;
     }
-
 
 }
